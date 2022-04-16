@@ -29,6 +29,7 @@ class Financial_Analysis:
         total_revenue_historic = []
         for year in income_statement_data["annualReports"]:
             total_revenue_historic.append(int(year["totalRevenue"]))
+        total_revenue_historic.reverse()
         self.total_revenue_historic_array = np.array(total_revenue_historic)
 
         self.net_income = int(cash_flow_data["annualReports"][0]["netIncome"])
@@ -36,6 +37,7 @@ class Financial_Analysis:
         net_income_historic = []
         for year in cash_flow_data["annualReports"]:
             net_income_historic.append(int(year["netIncome"]))
+        net_income_historic.reverse()
         self.net_income_historic_array = np.array(net_income_historic)
 
         self.gross_profit = int(income_statement_data["annualReports"][0]["grossProfit"])
@@ -43,6 +45,7 @@ class Financial_Analysis:
         gross_profit_historic = []
         for year in income_statement_data["annualReports"]:
             gross_profit_historic.append(int(year["grossProfit"]))
+        gross_profit_historic.reverse()
         self.gross_profit_historic_array = np.array(gross_profit_historic)
 
         self.eps_historic_array = []
@@ -67,28 +70,33 @@ class Financial_Analysis:
         debt_historic = []
         for year in balance_sheet_data["annualReports"]:
             debt_historic.append(int(year["shortLongTermDebtTotal"]))
+        debt_historic.reverse()
         self.debt_historic_array = np.array(debt_historic)
 
         operating_cash_flow_historic = []
         for year in cash_flow_data["annualReports"]:
             operating_cash_flow_historic.append(int(year["operatingCashflow"]))
+        operating_cash_flow_historic.reverse()
         self.operating_cash_flow_historic_array = np.array(operating_cash_flow_historic)
 
         total_assets_historic = []
         for year in balance_sheet_data["annualReports"]:
             total_assets_historic.append(int(year["totalAssets"]))
+        total_assets_historic.reverse()
         self.total_assets_historic_array = np.array(total_assets_historic)
 
 
         total_liabilities_historic = []
         for year in balance_sheet_data["annualReports"]:
             total_liabilities_historic.append(int(year["totalLiabilities"]))
+        total_liabilities_historic.reverse()
         self.total_liabilities_historic_array = np.array(total_liabilities_historic)
 
 
         years = []
         for year in balance_sheet_data["annualReports"]:
-            years.append(year)
+            years.append(year["fiscalDateEnding"])
+        years.reverse()
         self.years_array = np.array(years)
 
 
@@ -102,8 +110,19 @@ class Financial_Analysis:
         return self.total_liabilities / self.total_shareholder_equity
 
     def revenue_historic(self):
-        # return graph rather than just the list
-        return self.total_revenue_historic_array
+        x = np.arange(len(self.total_revenue_historic_array))
+        #y = np.linspace(0, np.amax(self.total_revenue_historic_array) + 100000000, 8)
+        fig, ax = plt.subplots()
+        bars = ax.bar(x, self.total_revenue_historic_array)
+        ax.set_title = "Historic Revenue"
+        ax.set_xticks(x)
+        ax.set_xticklabels(self.years_array)
+        #ax.set_yticks(y)
+        #ax.set_yticklabels(y)
+        ax.bar_label(bars)
+        plt.ylabel("Total Revenue ($)")
+        plt.xlabel("Date")
+        plt.show()
 
     def historic_net_income(self):
         # return graph rather just the list
@@ -147,7 +166,7 @@ class Financial_Analysis:
         # return graph rather than just the list
         return self.operating_cash_flow_historic_array
 
-    def asset_historic_vs_liabilities_historic(self):
+    #def asset_historic_vs_liabilities_historic(self):
         # return the graph of this
 
 
@@ -159,6 +178,7 @@ class Financial_Analysis:
 
 
 FA = Financial_Analysis("IBM")
+""""
 print(f"Current Ratio: {FA.current_ratio()}")
 print(f"Working Capital: {FA.working_capital()}")
 print(f"Debt to Equity Ratio: {FA.debt_equity_ratio()}")
@@ -175,3 +195,6 @@ print(f"Enterprise Value: {FA.enterprice_value()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
+"""
+FA.revenue_historic()
+
