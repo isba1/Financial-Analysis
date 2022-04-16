@@ -1,4 +1,5 @@
-
+import numpy as np
+import matplotlib.pyplot as plt
 import requests
 
 class Financial_Analysis:
@@ -25,23 +26,26 @@ class Financial_Analysis:
         self.total_shareholder_equity = int(balance_sheet_data["annualReports"][0]["totalShareholderEquity"])
         self.total_revenue_current = int(income_statement_data["annualReports"][0]["totalRevenue"])
 
-        self.total_revenue_historic = []
+        total_revenue_historic = []
         for year in income_statement_data["annualReports"]:
-            self.total_revenue_historic.append(int(year["totalRevenue"]))
+            total_revenue_historic.append(int(year["totalRevenue"]))
+        self.total_revenue_historic_array = np.array(total_revenue_historic)
 
         self.net_income = int(cash_flow_data["annualReports"][0]["netIncome"])
 
-        self.net_income_historic = []
+        net_income_historic = []
         for year in cash_flow_data["annualReports"]:
-            self.net_income_historic.append(int(year["netIncome"]))
+            net_income_historic.append(int(year["netIncome"]))
+        self.net_income_historic_array = np.array(net_income_historic)
 
         self.gross_profit = int(income_statement_data["annualReports"][0]["grossProfit"])
 
-        self.gross_profit_historic = []
+        gross_profit_historic = []
         for year in income_statement_data["annualReports"]:
-            self.gross_profit_historic.append(int(year["grossProfit"]))
+            gross_profit_historic.append(int(year["grossProfit"]))
+        self.gross_profit_historic_array = np.array(gross_profit_historic)
 
-        self.eps_historic = []
+        self.eps_historic_array = []
 
         self.shares_outstanding = int(balance_sheet_data["annualReports"][0]["commonStockSharesOutstanding"])
 
@@ -60,13 +64,32 @@ class Financial_Analysis:
 
         self.cash_cash_equivalents = int(balance_sheet_data["annualReports"][0]["cashAndCashEquivalentsAtCarryingValue"])
 
-        self.debt_historic = []
+        debt_historic = []
         for year in balance_sheet_data["annualReports"]:
-            self.debt_historic.append(int(year["currentDebt"]))
+            debt_historic.append(int(year["shortLongTermDebtTotal"]))
+        self.debt_historic_array = np.array(debt_historic)
 
-        self.operating_cash_flow_historic = []
+        operating_cash_flow_historic = []
         for year in cash_flow_data["annualReports"]:
-            self.operating_cash_flow_historic.append(int(year["operatingCashflow"]))
+            operating_cash_flow_historic.append(int(year["operatingCashflow"]))
+        self.operating_cash_flow_historic_array = np.array(operating_cash_flow_historic)
+
+        total_assets_historic = []
+        for year in balance_sheet_data["annualReports"]:
+            total_assets_historic.append(int(year["totalAssets"]))
+        self.total_assets_historic_array = np.array(total_assets_historic)
+
+
+        total_liabilities_historic = []
+        for year in balance_sheet_data["annualReports"]:
+            total_liabilities_historic.append(int(year["totalLiabilities"]))
+        self.total_liabilities_historic_array = np.array(total_liabilities_historic)
+
+
+        years = []
+        for year in balance_sheet_data["annualReports"]:
+            years.append(year)
+        self.years_array = np.array(years)
 
 
     def current_ratio(self):
@@ -79,21 +102,27 @@ class Financial_Analysis:
         return self.total_liabilities / self.total_shareholder_equity
 
     def revenue_historic(self):
-        return self.total_revenue_historic
+        # return graph rather than just the list
+        return self.total_revenue_historic_array
 
     def historic_net_income(self):
-        return self.net_income_historic
+        # return graph rather just the list
+        return self.net_income_historic_array
 
     def historic_gross_profit(self):
-        return self.gross_profit_historic
+        # return graph rather than just the list
+        return self.gross_profit_historic_array
 
     def EPS(self):
         return self.gross_profit / self.shares_outstanding
 
     def EPS_historic(self):
-        for item in self.gross_profit_historic:
-            self.eps_historic.append(item / self.shares_outstanding)
-        return self.eps_historic
+        eps_historic = []
+        for item in self.gross_profit_historic_array:
+            eps_historic.append(item / self.shares_outstanding)
+        self.eps_historic_array = np.array(eps_historic)
+        # return graph instead of the array
+        return self.eps_historic_array
 
     def free_cash_flow(self):
         return self.operating_cash_flow - self.capital_expenditures
@@ -111,10 +140,15 @@ class Financial_Analysis:
         return (self.final_closing_price * self.shares_outstanding) + self.current_debt - self.investments - self.cash_cash_equivalents
 
     def historic_debt(self):
-        return self.debt_historic
+        # return graph rather than just the list
+        return self.debt_historic_array
 
     def historic_cash_flow(self):
-        return self.operating_cash_flow_historic
+        # return graph rather than just the list
+        return self.operating_cash_flow_historic_array
+
+    def asset_historic_vs_liabilities_historic(self):
+        # return the graph of this
 
 
 
@@ -139,4 +173,5 @@ print(f"Price to Earnings Ratio: {FA.PE_ratio()}")
 print(f"EBITDA: {FA.EBITDA()}")
 print(f"Enterprise Value: {FA.enterprice_value()}")
 print(f"Historic Debt: {FA.historic_debt()}")
-print(f"Historic Cash Flow: {FA.operating_cash_flow_historic}")
+print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
+print(f"Historic Debt: {FA.historic_debt()}")
