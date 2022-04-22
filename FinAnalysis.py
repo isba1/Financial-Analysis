@@ -28,7 +28,7 @@ class Financial_Analysis:
 
         total_revenue_historic = []
         for year in income_statement_data["annualReports"]:
-            total_revenue_historic.append(int(year["totalRevenue"]))
+            total_revenue_historic.append(float('{:0.2e}'.format(float(year["totalRevenue"]))))
         total_revenue_historic.reverse()
         self.total_revenue_historic_array = np.array(total_revenue_historic)
 
@@ -36,7 +36,7 @@ class Financial_Analysis:
 
         net_income_historic = []
         for year in cash_flow_data["annualReports"]:
-            net_income_historic.append(int(year["netIncome"]))
+            net_income_historic.append(float('{:0.2e}'.format(float(year["netIncome"]))))
         net_income_historic.reverse()
         self.net_income_historic_array = np.array(net_income_historic)
 
@@ -44,7 +44,7 @@ class Financial_Analysis:
 
         gross_profit_historic = []
         for year in income_statement_data["annualReports"]:
-            gross_profit_historic.append(int(year["grossProfit"]))
+            gross_profit_historic.append(float('{:0.2e}'.format(float(year["grossProfit"]))))
         gross_profit_historic.reverse()
         self.gross_profit_historic_array = np.array(gross_profit_historic)
 
@@ -69,26 +69,26 @@ class Financial_Analysis:
 
         debt_historic = []
         for year in balance_sheet_data["annualReports"]:
-            debt_historic.append(int(year["shortLongTermDebtTotal"]))
+            debt_historic.append(float('{:0.2e}'.format(float(year["shortLongTermDebtTotal"]))))
         debt_historic.reverse()
         self.debt_historic_array = np.array(debt_historic)
 
         operating_cash_flow_historic = []
         for year in cash_flow_data["annualReports"]:
-            operating_cash_flow_historic.append(int(year["operatingCashflow"]))
+            operating_cash_flow_historic.append(float('{:0.2e}'.format(float(year["operatingCashflow"]))))
         operating_cash_flow_historic.reverse()
         self.operating_cash_flow_historic_array = np.array(operating_cash_flow_historic)
 
         total_assets_historic = []
         for year in balance_sheet_data["annualReports"]:
-            total_assets_historic.append(int(year["totalAssets"]))
+            total_assets_historic.append(float('{:0.2e}'.format(float(year["totalAssets"]))))
         total_assets_historic.reverse()
         self.total_assets_historic_array = np.array(total_assets_historic)
 
 
         total_liabilities_historic = []
         for year in balance_sheet_data["annualReports"]:
-            total_liabilities_historic.append(int(year["totalLiabilities"]))
+            total_liabilities_historic.append(float('{:0.2e}'.format(float(year["totalLiabilities"]))))
         total_liabilities_historic.reverse()
         self.total_liabilities_historic_array = np.array(total_liabilities_historic)
 
@@ -115,7 +115,7 @@ class Financial_Analysis:
         bars = ax.bar(x, self.total_revenue_historic_array)
         ax.set_title = "Historic Revenue"
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         ax.bar_label(bars, fontsize=8)
         plt.ylabel("Total Revenue ($)")
         plt.xlabel("Date")
@@ -128,7 +128,7 @@ class Financial_Analysis:
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.net_income_historic_array)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         ax.bar_label(bars, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Net Income ($)")
@@ -142,7 +142,7 @@ class Financial_Analysis:
         bars = ax.bar(x, self.gross_profit_historic_array)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         fig.suptitle("Historic Gross Profit")
         plt.xlabel("Date")
         plt.ylabel("Gross Profit ($)")
@@ -162,7 +162,7 @@ class Financial_Analysis:
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.eps_historic_array)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         ax.bar_label(bars, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Earnings Per Share (EPS)")
@@ -191,7 +191,7 @@ class Financial_Analysis:
         bars = ax.bar(x, self.debt_historic_array)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         plt.ylabel("Debt ($)")
         plt.xlabel("Date")
         fig.suptitle("Historic Debt")
@@ -204,7 +204,7 @@ class Financial_Analysis:
         bars = ax.bar(x, self.operating_cash_flow_historic_array)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Operating Cash FLow ($)")
         fig.suptitle("Historic Operating Cash Flow")
@@ -218,18 +218,34 @@ class Financial_Analysis:
         w = 4
         rect1 = ax.bar(x_large-w/2, self.total_assets_historic_array,width=4)
         rect2 = ax.bar(x_large+w/2, self.total_liabilities_historic_array, width=4)
-        ax.bar_label(rect1, fontsize=4)
-        ax.bar_label(rect2, fontsize=4)
+        ax.bar_label(rect1, fontsize=5)
+        ax.bar_label(rect2, fontsize=5)
         ax.set_xticks(x_large)
-        ax.set_xticklabels(self.years_array)
+        ax.set_xticklabels(self.years_array, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("$")
         # fix the legend placement using loc and bbox_to_anchor
-        ax.legend([rect1, rect2], ["Assets", "Liabilities"], loc="upper right", bbox_to_anchor=(1.2, 1.2))
+        ax.legend([rect1, rect2], ["Assets", "Liabilities"], loc="lower left", bbox_to_anchor=(0.92, 0.92))
         fig.suptitle("Historic Assets vs Historic Liabilities")
         fig.tight_layout()
         plt.show()
 
+    def rh_vs_gp_vs_ni(self):
+        x = np.arange(len(self.years_array))
+        fig, ax = plt.subplots()
+        bars1 = ax.bar(self.years_array, self.net_income_historic_array, label="Historic Net Income")
+        bars2 = ax.bar(self.years_array, self.gross_profit_historic_array, label="Historic Gross Profit", bottom=self.net_income_historic_array)
+        bars3 = ax.bar(self.years_array, self.total_revenue_historic_array, label="Historic Revenue", bottom=self.gross_profit_historic_array)
+        ax.set_xticks(x)
+        ax.set_xticklabels(self.years_array)
+        plt.legend(loc=2)
+        ax.bar_label(bars1, fontsize=8)
+        ax.bar_label(bars2, fontsize=8)
+        ax.bar_label(bars3, fontsize=8)
+        plt.xlabel("Date")
+        plt.ylabel("$")
+        plt.title("Historic Revenue vs Gross Profit vs Net Income")
+        plt.show()
 
 
 
@@ -257,10 +273,12 @@ print(f"Historic Debt: {FA.historic_debt()}")
 print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
-FA.revenue_historic()
-FA.historic_net_income()
-FA.historic_gross_profit()
-FA.EPS_historic()
-FA.historic_debt()
-FA.historic_cash_flow()
-FA.asset_historic_vs_liabilities_historic()
+#FA.revenue_historic()
+#FA.historic_net_income()
+#FA.historic_gross_profit()
+#FA.EPS_historic()
+#FA.historic_debt()
+#FA.historic_cash_flow()
+#FA.asset_historic_vs_liabilities_historic()
+#FA.rh_vs_gp_vs_ni()
+FA.rh_vs_gp_vs_ni()
