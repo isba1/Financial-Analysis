@@ -207,7 +207,7 @@ class Financial_Analysis:
         ax.set_xticklabels(self.years_array, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Operating Cash FLow ($)")
-        fig.suptitle("Historic Operating Cash Flow")
+        plt.title("Historic Operating Cash Flow")
         plt.show()
 
     def asset_historic_vs_liabilities_historic(self):
@@ -216,37 +216,44 @@ class Financial_Analysis:
         x_large = x * 10
         fig, ax = plt.subplots()
         w = 4
-        rect1 = ax.bar(x_large-w/2, self.total_assets_historic_array,width=4)
+        rect1 = ax.bar(x_large-w/2, self.total_assets_historic_array, width=4)
         rect2 = ax.bar(x_large+w/2, self.total_liabilities_historic_array, width=4)
-        ax.bar_label(rect1, fontsize=5)
-        ax.bar_label(rect2, fontsize=5)
-        ax.set_xticks(x_large)
-        ax.set_xticklabels(self.years_array, fontsize=8)
-        plt.xlabel("Date")
+        #ax.bar_label(rect1, fontsize=5)
+        #ax.bar_label(rect2, fontsize=5)
+        ax.set_xticks([])
+        ax.set_xticklabels([])
+        #plt.xlabel("Date")
         plt.ylabel("$")
         # fix the legend placement using loc and bbox_to_anchor
         ax.legend([rect1, rect2], ["Assets", "Liabilities"], loc="lower left", bbox_to_anchor=(0.92, 0.92))
         fig.suptitle("Historic Assets vs Historic Liabilities")
         fig.tight_layout()
+        plt.table(cellText=[self.total_assets_historic_array, self.total_liabilities_historic_array],
+                  colLabels=self.years_array,
+                  rowLabels=("Historic Assets", "Historic Liabilites"),
+                  rowColours=("lightsteelblue", "bisque"))
         plt.show()
 
     def rh_vs_gp_vs_ni(self):
         x = np.arange(len(self.years_array))
         fig, ax = plt.subplots()
-        bars1 = ax.bar(self.years_array, self.net_income_historic_array, label="Historic Net Income")
-        bars2 = ax.bar(self.years_array, self.gross_profit_historic_array, label="Historic Gross Profit", bottom=self.net_income_historic_array)
-        bars3 = ax.bar(self.years_array, self.total_revenue_historic_array, label="Historic Revenue", bottom=self.gross_profit_historic_array)
-        ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
-        plt.legend(loc=2)
-        ax.bar_label(bars1, fontsize=8)
-        ax.bar_label(bars2, fontsize=8)
-        ax.bar_label(bars3, fontsize=8)
-        plt.xlabel("Date")
+        ax.bar(self.years_array, self.net_income_historic_array, label="Historic Net Income")
+        ax.bar(self.years_array, self.gross_profit_historic_array, label="Historic Gross Profit", bottom=self.net_income_historic_array)
+        ax.bar(self.years_array, self.total_revenue_historic_array, label="Historic Revenue", bottom=self.gross_profit_historic_array)
+        ax.legend(loc="lower left", bbox_to_anchor=(0.92, 0.92))
+        ax.set_xticks("")
+        ax.set_xticklabels([])
+        #plt.xlabel("Date")
         plt.ylabel("$")
         plt.title("Historic Revenue vs Gross Profit vs Net Income")
+        plt.table(cellText=[self.total_revenue_historic_array, self.gross_profit_historic_array,
+                            self.net_income_historic_array],
+                  rowLabels=("Historic Revenue", "Historic Gross Profit", "Historic Net Income"), loc="bottom",
+                  colLabels=self.years_array, rowColours=("yellowgreen", "bisque", "lightsteelblue")
+                  )
         plt.show()
 
+    #def rh_gp_ni_table(self):
 
 
 
@@ -254,7 +261,9 @@ class Financial_Analysis:
 
 
 
-FA = Financial_Analysis("AAPL")
+
+
+FA = Financial_Analysis("IBM")
 """"
 print(f"Current Ratio: {FA.current_ratio()}")
 print(f"Working Capital: {FA.working_capital()}")
@@ -278,7 +287,7 @@ print(f"Historic Debt: {FA.historic_debt()}")
 #FA.historic_gross_profit()
 #FA.EPS_historic()
 #FA.historic_debt()
-#FA.historic_cash_flow()
+FA.historic_cash_flow()
 #FA.asset_historic_vs_liabilities_historic()
 #FA.rh_vs_gp_vs_ni()
-FA.rh_vs_gp_vs_ni()
+#FA.rh_vs_gp_vs_ni()
