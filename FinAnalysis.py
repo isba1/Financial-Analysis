@@ -172,6 +172,10 @@ class Financial_Analysis:
         self.years_array = np.array(years)
 
         self.PE_ratio_rank = 0
+        self.EPS_past_rank = 0
+        self.EPS_current_rank = 0
+        self.ROE_past_rank = 0
+
 
     def current_ratio(self):
         return self.total_assets / self.total_liabilities
@@ -239,8 +243,8 @@ class Financial_Analysis:
 
         # calculates EPS for each year
         for i in range(0, len(self.net_income_historic_array)):
-            rnd = round(((self.net_income_historic_array[i] - self.dividend_payout_preferred_historic_array[i]) / self.shares_outstanding), 2)
-            eps_historic.append(rnd)
+            eps_historic.append((self.net_income_historic_array[i] - self.dividend_payout_preferred_historic_array[i]) / self.shares_outstanding)
+            # eps_historic.append(rnd)
         self.eps_historic_array = np.array(eps_historic)
 
         x = np.arange(len(self.eps_historic_array))
@@ -376,6 +380,7 @@ class Financial_Analysis:
         plt.show()
 
     def pe_ratio_rank(self):
+        # determines rank of PE ratio
         if self.PE_ratio() <= 15:
             self.PE_ratio_rank = 5
         elif 15 < self.PE_ratio() <= 20:
@@ -387,6 +392,75 @@ class Financial_Analysis:
         elif 30 < self.PE_ratio():
             self.PE_ratio_rank = 1
         return self.PE_ratio_rank
+
+    def EPS_rank_past(self):
+        # this defines average EPS rate of change over the last 5 years
+        yearly_rates_of_change_sum = 0
+        for i in range(0, len(self.eps_historic_array)-1):
+            yearly_rates_of_change_sum += ((self.eps_historic_array[i+1] - self.eps_historic_array[i]) / self.eps_historic_array[i]) * 100
+        avg_eps_roc_past = yearly_rates_of_change_sum / 4
+
+        # determines the rank of the EPS growth over past 5 years
+        if avg_eps_roc_past <= 3:
+            self.EPS_past_rank = 1
+        elif 3 < avg_eps_roc_past <= 7:
+            self.EPS_past_rank = 2
+        elif 7 < avg_eps_roc_past <= 11:
+            self.EPS_past_rank = 3
+        elif 11 < avg_eps_roc_past <= 14:
+            self.EPS_past_rank = 4
+        elif avg_eps_roc_past >= 15:
+            self.EPS_past_rank = 5
+        return self.EPS_past_rank
+
+    def EPS_rank_current(self):
+        # determines most recent growth in EPS compared to average EPS over last four years
+        past_four_year_sum = 0
+        for i in self.eps_historic_array[0:3]:
+            past_four_year_sum += i
+        past_four_year_avg = past_four_year_sum / 4
+        EPS_cur_rank = ((self.eps_historic_array[4] - past_four_year_avg) / past_four_year_avg) * 100
+
+        # determines rank of the recent growth compared to average EPS over last four years
+        if EPS_cur_rank <= 3:
+            self.EPS_current_rank = 1
+        elif 3 < EPS_cur_rank <= 7:
+            self.EPS_current_rank = 2
+        elif 7 < EPS_cur_rank <= 11:
+            self.EPS_current_rank = 3
+        elif 11 < EPS_cur_rank <= 14:
+            self.EPS_current_rank = 4
+        elif EPS_cur_rank >= 15:
+            self.EPS_current_rank = 5
+        return self.EPS_current_rank
+
+    def ROE_rank_past(self):
+        # this defines ROE growth over past 5 years
+        yearly_rates_of_change_sum = 0
+        for i in range(0, len(self.ROE_historic_array) - 1):
+            yearly_rates_of_change_sum += ((self.ROE_historic_array[i+1] - self.ROE_historic_array[i]) / self.ROE_historic_array[i]) * 100
+        avg_ROE_roc = yearly_rates_of_change_sum / 4
+
+        # this determines rank ROE growth over past 5 years
+        if avg_ROE_roc <= 5:
+            self.ROE_past_rank = 1
+        elif 5 < avg_ROE_roc <= 10:
+            self.ROE_past_rank = 2
+        elif 10 < avg_ROE_roc <= 15:
+            self.ROE_past_rank = 3
+        elif 15 < avg_ROE_roc <= 18:
+            self.ROE_past_rank = 4
+        elif 18 < avg_ROE_roc:
+            self.ROE_past_rank = 5
+        return self.ROE_past_rank
+
+
+
+
+
+
+
+
 
 
 FA = Financial_Analysis("IBM")
@@ -417,15 +491,21 @@ print(f"Historic Debt: {FA.historic_debt()}")
 # FA.asset_historic_vs_liabilities_historic()
 # FA.rh_vs_gp_vs_ni()
 # FA.rh_vs_gp_vs_ni()
-#FA.return_on_equity_historic()
+# FA.return_on_equity_historic()
 # FA.free_cash_flow_historic()
 # print(FA.net_income_historic_array)
 # print(FA.net_income)
 # print(FA.shares_outstanding)
-print(FA.PE_ratio())
+# print(FA.PE_ratio())
 # print(FA.EPS())
-#FA.EPS_historic()
-print(FA.pe_ratio_rank())
+# FA.EPS_historic()
+# print(FA.pe_ratio_rank())
+# print(FA.EPS_rank_past())
+# print(FA.net_income_historic_array)
+# print(FA.eps_historic_array)
+# print(FA.EPS_rank_current())
+FA.return_on_equity_historic()
+print(FA.ROE_rank_past())
 
 '''
 # Ended up requesting the API too many times so I can't us inheritance
