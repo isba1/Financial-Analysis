@@ -66,6 +66,20 @@ class Financial_Analysis:
         current_day = price_as_list[0]
         self.final_closing_price = float(price_data["Time Series (Daily)"][current_day]["4. close"])
 
+        '''
+        # API doesn't have data for prices going that far
+        current_day_year = int(current_day[0:4])
+        print(current_day_year)
+        current_day_date = current_day[4:10]
+        print(current_day_date)
+        print(f"{current_day_year - 1}{current_day_date}")
+        ytd_final_closing_price = []
+        for i in range(0, 5):
+            ytd_final_closing_price.append(float(price_data["Time Series (Daily)"][f"{current_day_year - 1}{current_day_date}"]["4. close"]))
+        ytd_final_closing_price.reverse()
+        self.ytd_fin_close_price = ytd_final_closing_price
+        '''
+
         self.EBITDA_data = int(income_statement_data["annualReports"][0]["ebitda"])
 
         self.current_debt = int(balance_sheet_data["annualReports"][0]["currentDebt"])
@@ -77,7 +91,10 @@ class Financial_Analysis:
 
         debt_historic = []
         for year in balance_sheet_data["annualReports"]:
-            debt_historic.append(float('{:0.2e}'.format(float(year["shortLongTermDebtTotal"]))))
+            if year["shortLongTermDebtTotal"] == "None":
+                debt_historic.append(0)
+            else:
+                debt_historic.append(float('{:0.2e}'.format(float(year["shortLongTermDebtTotal"]))))
         debt_historic.reverse()
         self.debt_historic_array = np.array(debt_historic)
 
@@ -117,14 +134,44 @@ class Financial_Analysis:
         total_shareholder_equity_historic.reverse()
         self.total_shareholder_equity_historic_array = np.array(total_shareholder_equity_historic)
 
+        if cash_flow_data["annualReports"][0]["dividendPayout"] == "None":
+            self.dividend_payout = 0
+        else:
+            self.dividend_payout = int(cash_flow_data["annualReports"][0]["dividendPayout"])
+
         self.ROE_historic_array = []
         self.historic_free_cash_flow = []
+
+        if cash_flow_data["annualReports"][0]["dividendPayoutPreferredStock"] == "None":
+            self.dividend_payout_preferred = 0
+        else:
+            self.dividend_payout_preferred = cash_flow_data["annualReports"][0]["dividendPayoutPreferredStock"]
+
+        dividend_payout_preferred_historic = []
+        for year in cash_flow_data["annualReports"]:
+            if year["dividendPayoutPreferredStock"] == "None":
+                dividend_payout_preferred_historic.append(0)
+            else:
+                dividend_payout_preferred_historic.append(float(year["dividendPayoutPreferredStock"]))
+        dividend_payout_preferred_historic.reverse()
+        self.dividend_payout_preferred_historic_array = np.array(dividend_payout_preferred_historic)
+
+
+        '''
+        shares_outstanding_historic = []
+        for year in balance_sheet_data["annualReports"]:
+            shares_outstanding_historic.append(float(year["commonStockSharesOutstanding"]))
+        shares_outstanding_historic.reverse()
+        self.shares_outstanding_historic_array = shares_outstanding_historic
+        '''
 
         years = []
         for year in balance_sheet_data["annualReports"]:
             years.append(year["fiscalDateEnding"])
         years.reverse()
         self.years_array = np.array(years)
+
+        self.PE_ratio_rank = 0
 
     def current_ratio(self):
         return self.total_assets / self.total_liabilities
@@ -134,6 +181,18 @@ class Financial_Analysis:
 
     def debt_equity_ratio(self):
         return self.total_liabilities / self.total_shareholder_equity
+
+    def price_book_ratio(self):
+        return self.final_closing_price/(self.total_shareholder_equity / self.shares_outstanding)
+
+    def price_to_sales(self):
+        return self.final_closing_price/self.total_revenue_current
+
+    def dividend_payout_ratio(self):
+        return self.dividend_payout / self.net_income
+
+    def dividend_payout_yield(self):
+        return (self.dividend_payout / self.shares_outstanding) / self.final_closing_price
 
     def revenue_historic(self):
         x = np.arange(len(self.total_revenue_historic_array))
@@ -173,14 +232,14 @@ class Financial_Analysis:
         plt.show()
 
     def EPS(self):
-        return round(self.gross_profit / self.shares_outstanding, 2)
+        return round(((self.net_income - self.dividend_payout_preferred) / self.shares_outstanding), 2)
 
     def EPS_historic(self):
         eps_historic = []
 
         # calculates EPS for each year
-        for item in self.gross_profit_historic_array:
-            rnd = round(item / self.shares_outstanding, 2)
+        for i in range(0, len(self.net_income_historic_array)):
+            rnd = round(((self.net_income_historic_array[i] - self.dividend_payout_preferred_historic_array[i]) / self.shares_outstanding), 2)
             eps_historic.append(rnd)
         self.eps_historic_array = np.array(eps_historic)
 
@@ -219,7 +278,7 @@ class Financial_Analysis:
         return self.total_shareholder_equity / self.shares_outstanding
 
     def PE_ratio(self):
-        return self.final_closing_price / (self.gross_profit / self.shares_outstanding)
+        return (self.final_closing_price / self.EPS())
 
     def EBITDA(self):
         return self.EBITDA_data
@@ -245,9 +304,6 @@ class Financial_Analysis:
         plt.xlabel("Date")
         fig.suptitle("Historic Return on Equity (ROE)")
         plt.show()
-
-
-
 
     def historic_debt(self):
         x = np.arange(len(self.debt_historic_array))
@@ -319,6 +375,19 @@ class Financial_Analysis:
                   )
         plt.show()
 
+    def pe_ratio_rank(self):
+        if self.PE_ratio() <= 15:
+            self.PE_ratio_rank = 5
+        elif 15 < self.PE_ratio() <= 20:
+            self.PE_ratio_rank = 4
+        elif 20 < self.PE_ratio() <= 25:
+            self.PE_ratio_rank = 3
+        elif 25 < self.PE_ratio() <= 30:
+            self.PE_ratio_rank = 2
+        elif 30 < self.PE_ratio():
+            self.PE_ratio_rank = 1
+        return self.PE_ratio_rank
+
 
 FA = Financial_Analysis("IBM")
 """"
@@ -350,3 +419,36 @@ print(f"Historic Debt: {FA.historic_debt()}")
 # FA.rh_vs_gp_vs_ni()
 #FA.return_on_equity_historic()
 # FA.free_cash_flow_historic()
+# print(FA.net_income_historic_array)
+# print(FA.net_income)
+# print(FA.shares_outstanding)
+print(FA.PE_ratio())
+# print(FA.EPS())
+#FA.EPS_historic()
+print(FA.pe_ratio_rank())
+
+'''
+# Ended up requesting the API too many times so I can't us inheritance
+class Rank(Financial_Analysis):
+    def __init__(self, symbol):
+        super().__init__(symbol)
+        self.PE_ratio_rank = 0
+
+    def pe_rank(self):
+        # self.PE_ratio_rank = 0
+        if super().PE_ratio() <= 15:
+            self.PE_ratio_rank = 5
+        elif 15 < super().PE_ratio() <= 20:
+            self.PE_ratio_rank = 4
+        elif 20 < super().PE_ratio() <= 25:
+            self.PE_ratio_rank = 3
+        elif 25 < super().PE_ratio() <= 30:
+            self.PE_ratio_rank = 2
+        elif 30 < super().PE_ratio():
+            self.PE_ratio_rank = 1
+        return self.PE_ratio_rank
+
+
+r = Rank("IBM")
+print(r.pe_rank())
+'''
