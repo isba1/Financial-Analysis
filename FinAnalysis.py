@@ -175,6 +175,9 @@ class Financial_Analysis:
         self.EPS_past_rank = 0
         self.EPS_current_rank = 0
         self.ROE_past_rank = 0
+        self.ROE_current_rank = 0
+        self.FCF_past_rank = 0
+        self.FCF_current_rank = 0
 
 
     def current_ratio(self):
@@ -419,18 +422,18 @@ class Financial_Analysis:
         for i in self.eps_historic_array[0:3]:
             past_four_year_sum += i
         past_four_year_avg = past_four_year_sum / 4
-        EPS_cur_rank = ((self.eps_historic_array[4] - past_four_year_avg) / past_four_year_avg) * 100
+        EPS_cur_growth = ((self.eps_historic_array[4] - past_four_year_avg) / past_four_year_avg) * 100
 
         # determines rank of the recent growth compared to average EPS over last four years
-        if EPS_cur_rank <= 3:
+        if EPS_cur_growth <= 3:
             self.EPS_current_rank = 1
-        elif 3 < EPS_cur_rank <= 7:
+        elif 3 < EPS_cur_growth <= 7:
             self.EPS_current_rank = 2
-        elif 7 < EPS_cur_rank <= 11:
+        elif 7 < EPS_cur_growth <= 11:
             self.EPS_current_rank = 3
-        elif 11 < EPS_cur_rank <= 14:
+        elif 11 < EPS_cur_growth <= 14:
             self.EPS_current_rank = 4
-        elif EPS_cur_rank >= 15:
+        elif EPS_cur_growth >= 15:
             self.EPS_current_rank = 5
         return self.EPS_current_rank
 
@@ -446,13 +449,82 @@ class Financial_Analysis:
             self.ROE_past_rank = 1
         elif 5 < avg_ROE_roc <= 10:
             self.ROE_past_rank = 2
-        elif 10 < avg_ROE_roc <= 15:
+        elif 10 < avg_ROE_roc <= 14:
             self.ROE_past_rank = 3
-        elif 15 < avg_ROE_roc <= 18:
+        elif 14 < avg_ROE_roc <= 17:
             self.ROE_past_rank = 4
-        elif 18 < avg_ROE_roc:
+        elif 17 < avg_ROE_roc:
             self.ROE_past_rank = 5
         return self.ROE_past_rank
+
+    def ROE_rank_current(self):
+        # get average ROE over last 4 years
+        four_year_sum = 0
+        for i in self.ROE_historic_array[0:3]:
+            four_year_sum += i
+        four_year_avg = four_year_sum / 4
+
+        # calculates current growth compared to last 4 year average
+        ROE_cur_growth = ((self.ROE_historic_array[4] - four_year_avg) / four_year_avg) * 100
+
+        # determines rank of ROE
+        if ROE_cur_growth <= 5:
+            self.ROE_current_rank = 1
+        elif 5 < ROE_cur_growth <= 10:
+            self.ROE_current_rank = 2
+        elif 10 < ROE_cur_growth <= 14:
+            self.ROE_current_rank = 3
+        elif 14 < ROE_cur_growth <= 17:
+            self.ROE_current_rank = 4
+        elif 17 < ROE_cur_growth:
+            self.ROE_current_rank = 5
+        return self.ROE_current_rank
+
+    def free_cash_rank_current(self):
+        # determines four year avg of FCF
+        four_year_sum = 0
+        for i in self.historic_free_cash_flow[0:3]:
+            four_year_sum += i
+        four_year_avg = four_year_sum / 4
+
+        # determinges current rate of change
+        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+
+        # determines current rank of FCF
+        if current_roc <= 5:
+            self.FCF_current_rank = 1
+        elif 5 < current_roc <= 10:
+            self.FCF_current_rank = 2
+        elif 10 < current_roc <= 15:
+            self.FCF_current_rank = 3
+        elif 15 < current_roc <= 20:
+            self.FCF_current_rank = 4
+        elif 20 < current_roc:
+            self.FCF_current_rank = 5
+        return self.FCF_current_rank
+
+    def free_cash_rank_past(self):
+        # determines average rate of change over last five years
+        yearly_rates_of_change_sum = 0
+        for i in range(0, len(self.historic_free_cash_flow) - 1):
+            yearly_rates_of_change_sum += ((self.historic_free_cash_flow[i+1] - self.historic_free_cash_flow[i]) / self.historic_free_cash_flow[i]) * 100
+        avg_roc = yearly_rates_of_change_sum / 4
+
+        if avg_roc <= 5:
+            self.FCF_past_rank = 1
+        elif 5 < avg_roc <= 10:
+            self.FCF_past_rank = 2
+        elif 10 < avg_roc <= 15:
+            self.FCF_past_rank = 3
+        elif 15 < avg_roc <= 20:
+            self.FCF_past_rank = 4
+        elif 20 < avg_roc:
+            self.FCF_past_rank = 5
+        return self.FCF_past_rank
+
+
+
+
 
 
 
