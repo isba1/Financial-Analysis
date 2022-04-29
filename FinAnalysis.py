@@ -156,7 +156,6 @@ class Financial_Analysis:
         dividend_payout_preferred_historic.reverse()
         self.dividend_payout_preferred_historic_array = np.array(dividend_payout_preferred_historic)
 
-
         '''
         shares_outstanding_historic = []
         for year in balance_sheet_data["annualReports"]:
@@ -178,7 +177,10 @@ class Financial_Analysis:
         self.ROE_current_rank = 0
         self.FCF_past_rank = 0
         self.FCF_current_rank = 0
-
+        self.current_ratio_rank = 0
+        self.dte_rank = 0
+        self.ptb_rank = 0
+        self.pts_rank = 0
 
     def current_ratio(self):
         return self.total_assets / self.total_liabilities
@@ -189,11 +191,8 @@ class Financial_Analysis:
     def debt_equity_ratio(self):
         return self.total_liabilities / self.total_shareholder_equity
 
-    def price_book_ratio(self):
-        return self.final_closing_price/(self.total_shareholder_equity / self.shares_outstanding)
-
     def price_to_sales(self):
-        return self.final_closing_price/self.total_revenue_current
+        return self.final_closing_price / self.total_revenue_current
 
     def dividend_payout_ratio(self):
         return self.dividend_payout / self.net_income
@@ -246,7 +245,8 @@ class Financial_Analysis:
 
         # calculates EPS for each year
         for i in range(0, len(self.net_income_historic_array)):
-            eps_historic.append((self.net_income_historic_array[i] - self.dividend_payout_preferred_historic_array[i]) / self.shares_outstanding)
+            eps_historic.append((self.net_income_historic_array[i] - self.dividend_payout_preferred_historic_array[
+                i]) / self.shares_outstanding)
             # eps_historic.append(rnd)
         self.eps_historic_array = np.array(eps_historic)
 
@@ -267,7 +267,8 @@ class Financial_Analysis:
     def free_cash_flow_historic(self):
         # gives us an array of the past years free cash flow
         for i in range(0, len(self.operating_cash_flow_historic_array)):
-            self.historic_free_cash_flow.append(float('{:0.2e}'.format(self.operating_cash_flow_historic_array[i] - self.capital_expenditures_historic_array[i])))
+            self.historic_free_cash_flow.append(float('{:0.2e}'.format(
+                self.operating_cash_flow_historic_array[i] - self.capital_expenditures_historic_array[i])))
 
         x = np.arange(len(self.historic_free_cash_flow))
         fig, ax = plt.subplots()
@@ -280,12 +281,14 @@ class Financial_Analysis:
         plt.title("Historic Free Cash Flow")
         plt.show()
 
-
     def BVPS(self):
         return self.total_shareholder_equity / self.shares_outstanding
 
+    def price_to_book_ratio(self):
+        return self.final_closing_price / self.BVPS()
+
     def PE_ratio(self):
-        return (self.final_closing_price / self.EPS())
+        return self.final_closing_price / self.EPS()
 
     def EBITDA(self):
         return self.EBITDA_data
@@ -299,7 +302,8 @@ class Financial_Analysis:
     def return_on_equity_historic(self):
         # creates an array of historic ROE
         for i in range(0, len(self.net_income_historic_array)):
-            self.ROE_historic_array.append(self.net_income_historic_array[i] / self.total_shareholder_equity_historic_array[i])
+            self.ROE_historic_array.append(
+                self.net_income_historic_array[i] / self.total_shareholder_equity_historic_array[i])
 
         x = np.arange(len(self.ROE_historic_array))
         fig, ax = plt.subplots()
@@ -399,8 +403,9 @@ class Financial_Analysis:
     def EPS_rank_past(self):
         # this defines average EPS rate of change over the last 5 years
         yearly_rates_of_change_sum = 0
-        for i in range(0, len(self.eps_historic_array)-1):
-            yearly_rates_of_change_sum += ((self.eps_historic_array[i+1] - self.eps_historic_array[i]) / self.eps_historic_array[i]) * 100
+        for i in range(0, len(self.eps_historic_array) - 1):
+            yearly_rates_of_change_sum += ((self.eps_historic_array[i + 1] - self.eps_historic_array[i]) /
+                                           self.eps_historic_array[i]) * 100
         avg_eps_roc_past = yearly_rates_of_change_sum / 4
 
         # determines the rank of the EPS growth over past 5 years
@@ -441,7 +446,8 @@ class Financial_Analysis:
         # this defines ROE growth over past 5 years
         yearly_rates_of_change_sum = 0
         for i in range(0, len(self.ROE_historic_array) - 1):
-            yearly_rates_of_change_sum += ((self.ROE_historic_array[i+1] - self.ROE_historic_array[i]) / self.ROE_historic_array[i]) * 100
+            yearly_rates_of_change_sum += ((self.ROE_historic_array[i + 1] - self.ROE_historic_array[i]) /
+                                           self.ROE_historic_array[i]) * 100
         avg_ROE_roc = yearly_rates_of_change_sum / 4
 
         # this determines rank ROE growth over past 5 years
@@ -507,7 +513,8 @@ class Financial_Analysis:
         # determines average rate of change over last five years
         yearly_rates_of_change_sum = 0
         for i in range(0, len(self.historic_free_cash_flow) - 1):
-            yearly_rates_of_change_sum += ((self.historic_free_cash_flow[i+1] - self.historic_free_cash_flow[i]) / self.historic_free_cash_flow[i]) * 100
+            yearly_rates_of_change_sum += ((self.historic_free_cash_flow[i + 1] - self.historic_free_cash_flow[i]) /
+                                           self.historic_free_cash_flow[i]) * 100
         avg_roc = yearly_rates_of_change_sum / 4
 
         if avg_roc <= 5:
@@ -522,17 +529,31 @@ class Financial_Analysis:
             self.FCF_past_rank = 5
         return self.FCF_past_rank
 
+    def rank_current_ratio(self):
+        if self.current_ratio() <= 0.5:
+            self.current_ratio_rank = 1
+        elif 0.5 < self.current_ratio() <= 1:
+            self.current_ratio_rank = 2
+        elif 1 < self.current_ratio() <= 1.2:
+            self.current_ratio_rank = 3
+        elif 1.2 < self.current_ratio() <= 1.5:
+            self.current_ratio_rank = 4
+        elif 1.5 < self.current_ratio():
+            self.current_ratio_rank = 5
+        return self.current_ratio_rank
 
-
-
-
-
-
-
-
-
-
-
+    def debt_to_equity_rank(self):
+        if self.debt_equity_ratio() >= 2:
+            self.dte_rank = 1
+        elif 1.5 <= self.debt_equity_ratio() < 2:
+            self.dte_rank = 2
+        elif 1 <= self.debt_equity_ratio() < 1.5:
+            self.dte_rank = 3
+        elif 0.8 <= self.debt_equity_ratio() < 1:
+            self.dte_rank = 4
+        elif self.debt_equity_ratio() < 0.8:
+            self.dte_rank = 5
+        return self.dte_rank
 
 
 FA = Financial_Analysis("IBM")
