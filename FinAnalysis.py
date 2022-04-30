@@ -139,6 +139,21 @@ class Financial_Analysis:
         else:
             self.dividend_payout = int(cash_flow_data["annualReports"][0]["dividendPayout"])
 
+        '''
+        Don't end up using this
+        dividend_payout_historic = []
+        for year in cash_flow_data["annualReports"]:
+            if year["dividendPayout"] == "None":
+                dividend_payout_historic.append(0)
+            else:
+                dividend_payout_historic.append(float(year["dividendPayout"]))
+        dividend_payout_historic.reverse()
+        self.dividend_payout_historic_array = dividend_payout_historic
+        '''
+
+        # self.dividend_payout_ratio_historic = []
+
+
         self.ROE_historic_array = []
         self.historic_free_cash_flow = []
 
@@ -181,6 +196,9 @@ class Financial_Analysis:
         self.dte_rank = 0
         self.ptb_rank = 0
         self.pts_rank = 0
+        self.dividend_payout_ratio_rank = 0
+        self.dividend_yield_rank = 0
+        self.avg_rank = 0
 
     def current_ratio(self):
         return self.total_assets / self.total_liabilities
@@ -197,7 +215,7 @@ class Financial_Analysis:
     def dividend_payout_ratio(self):
         return self.dividend_payout / self.net_income
 
-    def dividend_payout_yield(self):
+    def dividend_yield_ratio(self):
         return (self.dividend_payout / self.shares_outstanding) / self.final_closing_price
 
     def revenue_historic(self):
@@ -386,6 +404,16 @@ class Financial_Analysis:
                   )
         plt.show()
 
+
+    """
+    I actually don't want to use historic dividend payout
+    def dividend_payout_ratio_historic(self):
+        # determines the values of the historic dividend payout ratio
+        for i in range(0, len(self.dividend_payout_historic_array)):
+            self.dividend_payout_ratio_historic.append(self.dividend_payout_historic_array[i] / self.net_income_historic_array[i])
+        return self.dividend_payout_ratio_historic
+    """
+
     def pe_ratio_rank(self):
         # determines rank of PE ratio
         if self.PE_ratio() <= 15:
@@ -555,8 +583,71 @@ class Financial_Analysis:
             self.dte_rank = 5
         return self.dte_rank
 
+    def price_to_book_rank(self):
+        if self.price_to_book_ratio() <= 1:
+            self.ptb_rank = 5
+        elif 1 < self.price_to_book_ratio() <= 3:
+            self.ptb_rank = 4
+        elif 3 < self.price_to_book_ratio() <= 5:
+            self.ptb_rank = 3
+        elif 5 < self.price_to_book_ratio() <= 7:
+            self.ptb_rank = 2
+        elif 7 < self.price_to_book_ratio():
+            self.ptb_rank = 1
+        return self.ptb_rank
 
-FA = Financial_Analysis("IBM")
+    def price_to_sales_rank(self):
+        if self.price_to_sales() <= 1:
+            self.pts_rank = 5
+        elif 1 < self.price_to_sales() <= 2:
+            self.pts_rank = 4
+        elif 2 < self.price_to_sales() <= 3:
+            self.pts_rank = 3
+        elif 3 < self.price_to_sales() <= 4:
+            self.pts_rank = 2
+        elif 4 < self.price_to_sales():
+            self.pts_rank = 1
+        return self.pts_rank
+
+    def ratio_dividend_payout_rank(self):
+        if 30 <= self.dividend_payout_ratio() <= 50:
+            self.dividend_payout_ratio_rank = 5
+        elif (50 < self.dividend_payout_ratio() <= 55) or (25 <= self.dividend_payout_ratio() < 30):
+            self.dividend_payout_ratio_rank = 4
+        elif (55 < self.dividend_payout_ratio() <= 60) or (20 <= self.dividend_payout_ratio() < 25):
+            self.dividend_payout_ratio_rank = 3
+        elif (60 < self.dividend_payout_ratio() <= 65) or (15 <= self.dividend_payout_ratio() < 20):
+            self.dividend_payout_ratio_rank = 2
+        elif (65 < self.dividend_payout_ratio()) or (self.dividend_payout_ratio() < 15):
+            self.dividend_payout_ratio_rank = 1
+        return self.dividend_payout_ratio_rank
+
+    def rank_dividend_yield_ratio(self):
+        if 6 <= self.dividend_yield_ratio():
+            self.dividend_yield_rank = 5
+        elif 4 <= self.dividend_yield_ratio() < 6:
+            self.dividend_yield_rank = 4
+        elif 2 <= self.dividend_yield_ratio() < 4:
+            self.dividend_yield_rank = 3
+        elif 1 <= self.dividend_yield_ratio() < 2:
+            self.dividend_yield_rank = 2
+        elif self.dividend_yield_ratio() < 1:
+            self.dividend_yield_rank = 1
+        return self.dividend_yield_rank
+
+    def total_rank(self):
+        total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio()
+        self.avg_rank = total_rank_sum / 13
+        return self.avg_rank
+
+
+
+
+
+
+
+
+FA = Financial_Analysis("AAPL")
 """"
 print(f"Current Ratio: {FA.current_ratio()}")
 print(f"Working Capital: {FA.working_capital()}")
@@ -575,30 +666,44 @@ print(f"Historic Debt: {FA.historic_debt()}")
 print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
-# FA.revenue_historic()
-# FA.historic_net_income()
-# FA.historic_gross_profit()
-# FA.EPS_historic()
-# FA.historic_debt()
-# FA.historic_cash_flow()
-# FA.asset_historic_vs_liabilities_historic()
-# FA.rh_vs_gp_vs_ni()
-# FA.rh_vs_gp_vs_ni()
-# FA.return_on_equity_historic()
-# FA.free_cash_flow_historic()
-# print(FA.net_income_historic_array)
-# print(FA.net_income)
-# print(FA.shares_outstanding)
-# print(FA.PE_ratio())
-# print(FA.EPS())
-# FA.EPS_historic()
-# print(FA.pe_ratio_rank())
-# print(FA.EPS_rank_past())
-# print(FA.net_income_historic_array)
-# print(FA.eps_historic_array)
-# print(FA.EPS_rank_current())
+FA.current_ratio()
+FA.working_capital()
+FA.debt_equity_ratio()
+FA.price_to_sales()
+FA.dividend_payout_ratio()
+FA.dividend_yield_ratio()
+FA.revenue_historic()
+FA.historic_net_income()
+FA.historic_gross_profit()
+FA.EPS()
+FA.EPS_historic()
+FA.free_cash_flow()
+FA.free_cash_flow_historic()
+FA.BVPS()
+FA.price_to_book_ratio()
+FA.PE_ratio()
+FA.EBITDA()
+FA.enterprice_value()
+FA.return_on_equity()
 FA.return_on_equity_historic()
-print(FA.ROE_rank_past())
+FA.historic_debt()
+FA.historic_cash_flow()
+FA.asset_historic_vs_liabilities_historic()
+FA.rh_vs_gp_vs_ni()
+FA.pe_ratio_rank()
+FA.EPS_rank_past()
+FA.EPS_rank_current()
+FA.ROE_rank_past()
+FA.ROE_rank_current()
+FA.free_cash_rank_past()
+FA.free_cash_rank_current()
+FA.rank_current_ratio()
+FA.debt_to_equity_rank()
+FA.price_to_book_rank()
+FA.price_to_sales_rank()
+FA.ratio_dividend_payout_rank()
+FA.rank_dividend_yield_ratio()
+print(FA.total_rank())
 
 '''
 # Ended up requesting the API too many times so I can't us inheritance
