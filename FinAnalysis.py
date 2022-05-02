@@ -7,20 +7,23 @@ class Financial_Analysis:
     def __init__(self, symbol):
 
         self.symbol = symbol
-        url_price = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={self.symbol}&apikey=KJHOTYX4RQYVFABB"
+        url_price_daily = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={self.symbol}&apikey=KJHOTYX4RQYVFABB"
         url_income_statement = f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={self.symbol}&apikey=KJHOTYX4RQYVFABB"
         url_balance_sheet = f"https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={self.symbol}&apikey=KJHOTYX4RQYVFABB"
         url_cash_flow = f"https://www.alphavantage.co/query?function=CASH_FLOW&symbol={self.symbol}&apikey=KJHOTYX4RQYVFABB"
+        url_price_monthly = f"https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol={self.symbol}&apikey=KJHOTYX4RQYVFABB"
 
         income_statement = requests.get(url_income_statement)
         balance_sheet = requests.get(url_balance_sheet)
         cash_flow = requests.get(url_cash_flow)
-        price = requests.get(url_price)
+        price_daily = requests.get(url_price_daily)
+        price_monthly = requests.get(url_price_monthly)
 
         income_statement_data = income_statement.json()
         balance_sheet_data = balance_sheet.json()
         cash_flow_data = cash_flow.json()
-        price_data = price.json()
+        price_data_daily = price_daily.json()
+        price_data_monthly = price_monthly.json()
 
         self.total_assets = int(balance_sheet_data["annualReports"][0]["totalAssets"])
         self.total_liabilities = int(balance_sheet_data["annualReports"][0]["totalLiabilities"])
@@ -62,9 +65,31 @@ class Financial_Analysis:
         capital_expenditures_historic.reverse()
         self.capital_expenditures_historic_array = np.array(capital_expenditures_historic)
 
-        price_as_list = list(price_data["Time Series (Daily)"])
+        price_as_list = list(price_data_daily["Time Series (Daily)"])
         current_day = price_as_list[0]
-        self.final_closing_price = float(price_data["Time Series (Daily)"][current_day]["4. close"])
+        self.final_closing_price = float(price_data_daily["Time Series (Daily)"][current_day]["4. close"])
+
+
+
+
+        # current monthly closing price
+        price_as_list_month = list(price_data_monthly["Monthly Time Series"])
+        current_month = price_as_list_month[0]
+        self.monthly_closing_price = float(price_data_monthly["Monthly Time Series"][current_month]["4. close"])
+
+        # five ytd monthly closing price
+        five_ytd = price_as_list_month[60]
+        self.monthly_closing_price_five_ytd = float(price_data_monthly["Monthly Time Series"][five_ytd]["4. close"])
+
+        self.five_ytd_shares_outstanding = float(balance_sheet_data["annualReports"][4]["commonStockSharesOutstanding"])
+
+
+
+
+
+
+
+
 
         '''
         # API doesn't have data for prices going that far
@@ -75,7 +100,7 @@ class Financial_Analysis:
         print(f"{current_day_year - 1}{current_day_date}")
         ytd_final_closing_price = []
         for i in range(0, 5):
-            ytd_final_closing_price.append(float(price_data["Time Series (Daily)"][f"{current_day_year - 1}{current_day_date}"]["4. close"]))
+            ytd_final_closing_price.append(float(price_data_daily["Time Series (Daily)"][f"{current_day_year - 1}{current_day_date}"]["4. close"]))
         ytd_final_closing_price.reverse()
         self.ytd_fin_close_price = ytd_final_closing_price
         '''
@@ -199,6 +224,7 @@ class Financial_Analysis:
         self.dividend_payout_ratio_rank = 0
         self.dividend_yield_rank = 0
         self.avg_rank = 0
+        self.compare = []
 
     def current_ratio(self):
         return self.total_assets / self.total_liabilities
@@ -638,7 +664,20 @@ class Financial_Analysis:
     def total_rank(self):
         total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio()
         self.avg_rank = total_rank_sum / 13
-        return self.avg_rank
+        return round(self.avg_rank, 4)
+
+    def five_ytd_change(self):
+        # returns five ytd percent change in stock price
+        market_cap_past = self.monthly_closing_price_five_ytd * self.five_ytd_shares_outstanding
+        market_cap_current = self.final_closing_price * self.shares_outstanding
+        return round((((market_cap_current - market_cap_past) / market_cap_past) * 100), 4)
+
+    def compare_rank_return(self):
+        # compare total rank to annual return
+        self.compare.append(self.symbol)
+        self.compare.append(self.total_rank())
+        self.compare.append(self.five_ytd_change())
+        return self.compare
 
 
 
@@ -703,7 +742,9 @@ FA.price_to_book_rank()
 FA.price_to_sales_rank()
 FA.ratio_dividend_payout_rank()
 FA.rank_dividend_yield_ratio()
-print(FA.total_rank())
+FA.total_rank()
+print(FA.five_ytd_change())
+print(FA.compare_rank_return())
 
 '''
 # Ended up requesting the API too many times so I can't us inheritance
