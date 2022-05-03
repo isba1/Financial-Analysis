@@ -23,5 +23,5 @@ json_object_balance = json.dumps(balance_sheet_data)
 json_object_cash = json.dumps(cash_flow_data)
 json_object_income = json.dumps(income_statement_data)
 
-with open('SectorFinAnalysisJson/AAPLJson/AAPLcash.json', 'w') as f:
-    f.write(json_object_cash)
+with open('SectorFinAnalysisJson/AAPLJson/AAPLbalancesheet.json', 'w') as f:
+    f.write(json_object_balance)
