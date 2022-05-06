@@ -685,55 +685,178 @@ class Sector_Analysis_XLE:
     def __init__(self):
         self.tickerListXLE = ["XOM", "CVX", "EOG", "COP", "SLB"]
 
+        # will need to read each ticker's json file as a python dictionary
+
+        # this block is for the ticker's balance sheets
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/XOMJson/XOMbalance.json",
+                'r') as f:
+            self.XOM_balance_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/CVXJson/CVXbalance.json",
+                'r') as f:
+            self.CVX_balance_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/EOGJson/EOGbalance.json",
+                'r') as f:
+            self.EOG_balance_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/COPJson/COPbalance.json",
+                'r') as f:
+            self.COP_balance_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/SLBJson/SLBbalance.json",
+                'r') as f:
+            self.SLB_balance_sheet = json.load(f)
+
+
+        # this block is for the ticker's cash statements
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/XOMJson/XOMcash.json",
+                'r') as f:
+            self.XOM_cash_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/CVXJson/CVXcash.json",
+                'r') as f:
+            self.CVX_cash_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/EOGJson/EOGcash.json",
+                'r') as f:
+            self.EOG_cash_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/COPJson/COPcash.json",
+                'r') as f:
+            self.COP_cash_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/SLBJson/SLBcash.json",
+                'r') as f:
+            self.SLB_cash_sheet = json.load(f)
+
+
+        # this block is for the ticker's income statements
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/XOMJson/XOMincome.json",
+                'r') as f:
+            self.XOM_income_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/CVXJson/CVXincome.json",
+                'r') as f:
+            self.CVX_income_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/EOGJson/EOGincome.json",
+                'r') as f:
+            self.EOG_income_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/COPJson/COPincome.json",
+                'r') as f:
+            self.COP_income_sheet = json.load(f)
+
+        with open(
+                "/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/SLBJson/SLBincome.json",
+                'r') as f:
+            self.SLB_income_sheet = json.load(f)
+
+
+    # function for XLE ticker's BVPS
     def BVPS_XLE(self):
 
         # dictionary that returns BVPS for each ticker
         BVPS_XLE_dict = {}
 
-        # will need to read each ticker's json file as a python dictionary
-        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/XOMJson/XOMbalance.json", 'r') as f:
-            XOM_balance_sheet = json.load(f)
-
-        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/CVXJson/CVXbalance.json", 'r') as f:
-            CVX_balance_sheet = json.load(f)
-
-        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/EOGJson/EOGbalance.json",'r') as f:
-            EOG_balance_sheet = json.load(f)
-
-        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/COPJson/COPbalance.json", 'r') as f:
-            COP_balance_sheet = json.load(f)
-
-        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/SLBJson/SLBbalance.json", 'r') as f:
-            SLB_balance_sheet = json.load(f)
-
         # adds each ticker's BVPS to the dictionary
-        BVPS_XLE_dict["XOM"] = round((float(XOM_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(XOM_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
-        BVPS_XLE_dict["CVX"] = round((float(CVX_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(CVX_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
-        BVPS_XLE_dict["EOG"] = round((float(EOG_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(EOG_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["XOM"] = round((float(self.XOM_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(self.XOM_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["CVX"] = round((float(self.CVX_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(self.CVX_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["EOG"] = round((float(self.EOG_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(self.EOG_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
         # for some reason COP shares outstanding in most recent years were negative, and I'm assuming it's a glitch in
         # the API, so I just used the most recent year with a positive shares outstanding value
-        BVPS_XLE_dict["COP"] = round((float(COP_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(COP_balance_sheet["annualReports"][2]["commonStockSharesOutstanding"])), 3)
-        BVPS_XLE_dict["SLB"] = round((float(SLB_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(SLB_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["COP"] = round((float(self.COP_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(self.COP_balance_sheet["annualReports"][2]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["SLB"] = round((float(self.SLB_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(self.SLB_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
 
         return BVPS_XLE_dict
 
-    # def 5 ytd for XLE tickers
+    # EPS for XLE tickers
+    def EPS_XLE(self):
+
+        # dictionary that returns the EPS for each ticker
+        EPS_XLE_dict = {}
+
+        # adds each ticker's EPS to the dictionary
+        EPS_XLE_dict["XOM"] = round((float(self.XOM_income_sheet["annualReports"][0]["grossProfit"]) / float(self.XOM_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        EPS_XLE_dict["CVX"] = round((float(self.CVX_income_sheet["annualReports"][0]["grossProfit"]) / float(self.CVX_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        EPS_XLE_dict["EOG"] = round((float(self.EOG_income_sheet["annualReports"][0]["grossProfit"]) / float(self.EOG_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        # for some reason COP shares outstanding in most recent years were negative, and I'm assuming it's a glitch in
+        # the API, so I just used the most recent year with a positive shares outstanding value
+        EPS_XLE_dict["COP"] = round((float(self.COP_income_sheet["annualReports"][0]["grossProfit"]) / float(self.COP_balance_sheet["annualReports"][2]["commonStockSharesOutstanding"])), 3)
+        EPS_XLE_dict["SLB"] = round((float(self.SLB_income_sheet["annualReports"][0]["grossProfit"]) / float(self.SLB_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+
+        # returns the final dictionary
+        return EPS_XLE_dict
+
+    # debt to equity for XLE tickers
+    def debt_equity_XLE(self):
+
+        # dictionary that contains tickers' debt to equity ratios
+        DE_XLE_dict = {}
+
+        # adds tickers' corresponding EPS to the dictionary
+        DE_XLE_dict["XOM"] = round(((float(self.XOM_balance_sheet["annualReports"][0]["totalLiabilities"])) / float(self.XOM_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        DE_XLE_dict["CVX"] = round(((float(self.CVX_balance_sheet["annualReports"][0]["totalLiabilities"])) / float(self.CVX_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        DE_XLE_dict["EOG"] = round(((float(self.EOG_balance_sheet["annualReports"][0]["totalLiabilities"])) / float(self.EOG_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        DE_XLE_dict["COP"] = round(((float(self.COP_balance_sheet["annualReports"][0]["totalLiabilities"])) / float(self.COP_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        DE_XLE_dict["SLB"] = round(((float(self.SLB_balance_sheet["annualReports"][0]["totalLiabilities"])) / float(self.SLB_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+
+        # returns the final dictionary
+        return DE_XLE_dict
 
 
-    # def EPS for XLE tickers
+    # ROE for XLE tickers
+    def ROE_XLE(self):
+        # dictionary that will contain the ticker and their ROE
+        ROE_XLE_dict = {}
+
+        # adds tickers' corresponding ROE to the dictionary
+        ROE_XLE_dict["XOM"] = round((float(self.XOM_cash_sheet["annualReports"][0]["netIncome"]) / float(self.XOM_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        ROE_XLE_dict["CVX"] = round((float(self.CVX_cash_sheet["annualReports"][0]["netIncome"]) / float(self.CVX_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        ROE_XLE_dict["EOG"] = round((float(self.EOG_cash_sheet["annualReports"][0]["netIncome"]) / float(self.EOG_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        ROE_XLE_dict["COP"] = round((float(self.COP_cash_sheet["annualReports"][0]["netIncome"]) / float(self.COP_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+        ROE_XLE_dict["SLB"] = round((float(self.SLB_cash_sheet["annualReports"][0]["netIncome"]) / float(self.SLB_balance_sheet["annualReports"][0]["totalShareholderEquity"])), 3)
+
+        # returns the final dictionary
+        return ROE_XLE_dict
 
 
-    # def debt to equity for XLE tickers
+    # free cash flow for XLE tickers
+    def free_cash_XLE(self):
+        # dictionary that contains the ticker and their free cash flow
+        FREE_CASH_XLE_dict = {}
 
+        # adds the ticker and corresponding free cash flow to the dictionary
+        FREE_CASH_XLE_dict["XOM"] = (float(self.XOM_cash_sheet["annualReports"][0]["operatingCashflow"]) - float(self.XOM_cash_sheet["annualReports"][0]["capitalExpenditures"]))
+        FREE_CASH_XLE_dict["CVX"] = (float(self.CVX_cash_sheet["annualReports"][0]["operatingCashflow"]) - float(self.CVX_cash_sheet["annualReports"][0]["capitalExpenditures"]))
+        FREE_CASH_XLE_dict["EOG"] = (float(self.EOG_cash_sheet["annualReports"][0]["operatingCashflow"]) - float(self.EOG_cash_sheet["annualReports"][0]["capitalExpenditures"]))
+        FREE_CASH_XLE_dict["COP"] = (float(self.COP_cash_sheet["annualReports"][0]["operatingCashflow"]) - float(self.COP_cash_sheet["annualReports"][0]["capitalExpenditures"]))
+        FREE_CASH_XLE_dict["SLB"] = (float(self.SLB_cash_sheet["annualReports"][0]["operatingCashflow"]) - float(self.SLB_cash_sheet["annualReports"][0]["capitalExpenditures"]))
 
-    # def ROE for XLE tickers
-
-
-    # def free cash flow for XLE tickers
-
+        # returns the final dictionary
+        return FREE_CASH_XLE_dict
 
 XLE = Sector_Analysis_XLE()
 print(XLE.BVPS_XLE())
+print(XLE.EPS_XLE())
+print(XLE.debt_equity_XLE())
+print(XLE.ROE_XLE())
+print(XLE.free_cash_XLE())
 
 class Sector_Analysis_XLB:
     def __init__(self):
@@ -793,9 +916,8 @@ class Sector_Analysis_XLRE:
 
 
 
-
+"""
 FA = Financial_Analysis("AAPL")
-""""
 print(f"Current Ratio: {FA.current_ratio()}")
 print(f"Working Capital: {FA.working_capital()}")
 print(f"Debt to Equity Ratio: {FA.debt_equity_ratio()}")
