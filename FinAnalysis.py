@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import requests
@@ -680,6 +681,113 @@ class Financial_Analysis:
         return self.compare
 
 
+class Sector_Analysis_XLE:
+    def __init__(self):
+        self.tickerListXLE = ["XOM", "CVX", "EOG", "COP", "SLB"]
+
+    def BVPS_XLE(self):
+
+        # dictionary that returns BVPS for each ticker
+        BVPS_XLE_dict = {}
+
+        # will need to read each ticker's json file as a python dictionary
+        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/XOMJson/XOMbalance.json", 'r') as f:
+            XOM_balance_sheet = json.load(f)
+
+        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/CVXJson/CVXbalance.json", 'r') as f:
+            CVX_balance_sheet = json.load(f)
+
+        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/EOGJson/EOGbalance.json",'r') as f:
+            EOG_balance_sheet = json.load(f)
+
+        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/COPJson/COPbalance.json", 'r') as f:
+            COP_balance_sheet = json.load(f)
+
+        with open("/Users/ishaandas/Documents/FinancialAnalysis/Financial-Analysis/SectorFinAnalysisJson/SLBJson/SLBbalance.json", 'r') as f:
+            SLB_balance_sheet = json.load(f)
+
+        # adds each ticker's BVPS to the dictionary
+        BVPS_XLE_dict["XOM"] = round((float(XOM_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(XOM_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["CVX"] = round((float(CVX_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(CVX_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["EOG"] = round((float(EOG_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(EOG_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+        # for some reason COP shares outstanding in most recent years were negative, and I'm assuming it's a glitch in
+        # the API, so I just used the most recent year with a positive shares outstanding value
+        BVPS_XLE_dict["COP"] = round((float(COP_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(COP_balance_sheet["annualReports"][2]["commonStockSharesOutstanding"])), 3)
+        BVPS_XLE_dict["SLB"] = round((float(SLB_balance_sheet["annualReports"][0]["totalShareholderEquity"]) / float(SLB_balance_sheet["annualReports"][0]["commonStockSharesOutstanding"])), 3)
+
+        return BVPS_XLE_dict
+
+    # def 5 ytd for XLE tickers
+
+
+    # def EPS for XLE tickers
+
+
+    # def debt to equity for XLE tickers
+
+
+    # def ROE for XLE tickers
+
+
+    # def free cash flow for XLE tickers
+
+
+XLE = Sector_Analysis_XLE()
+print(XLE.BVPS_XLE())
+
+class Sector_Analysis_XLB:
+    def __init__(self):
+        self.tickerListXLB = ["LIN", "FCX", "NEM", "SHW", "APD"]
+
+
+
+class Sector_Analysis_XLI:
+    def __init__(self):
+        self.tickerListXLI = ["HON", "UPS", "UNP", "BA", "RTX"]
+
+
+class Sector_Analysis_XLY:
+    def __init__(self):
+        self.tickerListXLY = ["AMZN", "TSLA", "HD", "NKE", "MCD"]
+
+
+class Sector_Analysis_XLP:
+    def __init__(self):
+        self.tickerListXLP = ["PG", "KO", "PEP", "WMT", "COST"]
+
+
+class Sector_Analysis_XLV:
+    def __init__(self):
+        self.tickerListXLV = ["UNH", "JNJ", "PFE", "ABBV", "TMO"]
+
+
+
+class Sector_Analysis_XLF:
+    def __init__(self):
+        self.tickerListXLF = ["JPM", "BAC", "WFC", "C", "MS"]
+
+
+class Sector_Analysis_XLU:
+    def __init__(self):
+        self.tickerListXLU = ["NEE", "DUK", "SO", "D", "EXC"]
+
+
+class Sector_Analysis_XLK:
+    def __init__(self):
+        self.tickerListXLK = ["AAPL", "MSFT", "NVDA", "V", "MA"]
+
+
+class Sector_Analysis_XLC:
+    def __init__(self):
+        self.tickerListXLC = ["FB", "GOOGL", "NFLX", "DIS", "CMCSA"]
+
+
+class Sector_Analysis_XLRE:
+    def __init__(self):
+        self.tickerListXlRE = ["AMT", "PLD", "CCI", "EQIX", "PSA"]
+
+
+
 
 
 
@@ -704,6 +812,8 @@ print(f"Enterprise Value: {FA.enterprice_value()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
+"""
+
 """
 FA.current_ratio()
 FA.working_capital()
@@ -745,6 +855,8 @@ FA.rank_dividend_yield_ratio()
 FA.total_rank()
 print(FA.five_ytd_change())
 print(FA.compare_rank_return())
+"""
+
 
 '''
 # Ended up requesting the API too many times so I can't us inheritance
