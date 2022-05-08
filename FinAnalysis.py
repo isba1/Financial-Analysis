@@ -26,10 +26,10 @@ class Financial_Analysis:
         price_data_daily = price_daily.json()
         price_data_monthly = price_monthly.json()
 
-        self.total_assets = int(balance_sheet_data["annualReports"][0]["totalAssets"])
-        self.total_liabilities = int(balance_sheet_data["annualReports"][0]["totalLiabilities"])
-        self.total_shareholder_equity = int(balance_sheet_data["annualReports"][0]["totalShareholderEquity"])
-        self.total_revenue_current = int(income_statement_data["annualReports"][0]["totalRevenue"])
+        self.total_assets = float(balance_sheet_data["annualReports"][0]["totalAssets"])
+        self.total_liabilities = float(balance_sheet_data["annualReports"][0]["totalLiabilities"])
+        self.total_shareholder_equity = float(balance_sheet_data["annualReports"][0]["totalShareholderEquity"])
+        self.total_revenue_current = float(income_statement_data["annualReports"][0]["totalRevenue"])
 
         total_revenue_historic = []
         for year in income_statement_data["annualReports"]:
@@ -37,7 +37,7 @@ class Financial_Analysis:
         total_revenue_historic.reverse()
         self.total_revenue_historic_array = np.array(total_revenue_historic)
 
-        self.net_income = int(cash_flow_data["annualReports"][0]["netIncome"])
+        self.net_income = float(cash_flow_data["annualReports"][0]["netIncome"])
 
         net_income_historic = []
         for year in cash_flow_data["annualReports"]:
@@ -45,7 +45,7 @@ class Financial_Analysis:
         net_income_historic.reverse()
         self.net_income_historic_array = np.array(net_income_historic)
 
-        self.gross_profit = int(income_statement_data["annualReports"][0]["grossProfit"])
+        self.gross_profit = float(income_statement_data["annualReports"][0]["grossProfit"])
 
         gross_profit_historic = []
         for year in income_statement_data["annualReports"]:
@@ -55,10 +55,10 @@ class Financial_Analysis:
 
         self.eps_historic_array = []
 
-        self.shares_outstanding = int(balance_sheet_data["annualReports"][0]["commonStockSharesOutstanding"])
+        self.shares_outstanding = float(balance_sheet_data["annualReports"][0]["commonStockSharesOutstanding"])
 
-        self.operating_cash_flow = int(cash_flow_data["annualReports"][0]["operatingCashflow"])
-        self.capital_expenditures = int(cash_flow_data["annualReports"][0]["capitalExpenditures"])
+        self.operating_cash_flow = float(cash_flow_data["annualReports"][0]["operatingCashflow"])
+        self.capital_expenditures = float(cash_flow_data["annualReports"][0]["capitalExpenditures"])
 
         capital_expenditures_historic = []
         for year in cash_flow_data["annualReports"]:
@@ -95,13 +95,13 @@ class Financial_Analysis:
         self.ytd_fin_close_price = ytd_final_closing_price
         '''
 
-        self.EBITDA_data = int(income_statement_data["annualReports"][0]["ebitda"])
+        self.EBITDA_data = float(income_statement_data["annualReports"][0]["ebitda"])
 
-        self.current_debt = int(balance_sheet_data["annualReports"][0]["currentDebt"])
+        self.current_debt = float(balance_sheet_data["annualReports"][0]["currentDebt"])
 
-        self.investments = int(balance_sheet_data["annualReports"][0]["investments"])
+        self.investments = float(balance_sheet_data["annualReports"][0]["investments"])
 
-        self.cash_cash_equivalents = int(
+        self.cash_cash_equivalents = float(
             balance_sheet_data["annualReports"][0]["cashAndCashEquivalentsAtCarryingValue"])
 
         debt_historic = []
@@ -152,8 +152,12 @@ class Financial_Analysis:
         if cash_flow_data["annualReports"][0]["dividendPayout"] == "None":
             self.dividend_payout = 0
         else:
-            self.dividend_payout = int(cash_flow_data["annualReports"][0]["dividendPayout"])
+            self.dividend_payout = float(cash_flow_data["annualReports"][0]["dividendPayout"])
 
+        self.cost_of_goods = float(income_statement_data["annualReports"][0]["costofGoodsAndServicesSold"])
+
+        self.current_assets = float(balance_sheet_data["annualReports"][0]["totalCurrentAssets"])
+        self.current_liabilities = float(balance_sheet_data["annualReports"][0]["totalCurrentLiabilities"])
         '''
         Don't end up using this
         dividend_payout_historic = []
@@ -214,12 +218,24 @@ class Financial_Analysis:
         self.dividend_yield_rank = 0
         self.avg_rank = 0
         self.compare = []
+        self.cash_flow_to_debt_rank = 0
+        self.historic_revenue_rank_past = 0
+        self.historic_revenue_rank_current = 0
+        self.historic_net_income_rank_past = 0
+        self.historic_net_income_rank_current = 0
+        self.net_income_margin_rank = 0
+        self.historic_gross_profit_rank_past = 0
+        self.historic_gross_profit_rank_current = 0
+        self.gross_profit_margin_rank = 0
+        self.working_capital_rank = 0
+        self.leverage_rank = 0
+        self.total_asset_turnover_rank = 0
 
     def current_ratio(self):
-        return self.total_assets / self.total_liabilities
+        return self.current_assets / self.current_liabilities
 
     def working_capital(self):
-        return self.total_assets - self.total_liabilities
+        return self.current_assets - self.current_liabilities
 
     def debt_equity_ratio(self):
         return self.total_liabilities / self.total_shareholder_equity
@@ -327,8 +343,7 @@ class Financial_Analysis:
         return self.EBITDA_data
 
     def enterprice_value(self):
-        return (
-                           self.final_closing_price * self.shares_outstanding) + self.current_debt - self.investments - self.cash_cash_equivalents
+        return (self.final_closing_price * self.shares_outstanding) + self.current_debt - self.investments - self.cash_cash_equivalents
 
     def return_on_equity(self):
         return self.net_income / self.total_shareholder_equity
@@ -419,6 +434,21 @@ class Financial_Analysis:
                   colLabels=self.years_array, rowColours=("yellowgreen", "bisque", "lightsteelblue")
                   )
         plt.show()
+
+    def cash_flow_to_debt(self):
+        return self.operating_cash_flow / self.current_debt
+
+    def leverage(self):
+        return self.total_assets / self.total_shareholder_equity
+
+    def total_asset_turnover(self):
+        return self.total_revenue_current / (self.total_assets / 2)
+
+    def net_income_margin(self):
+        return (self.net_income / self.total_revenue_current) * 100
+
+    def gross_profit_margin(self):
+        return ((self.total_revenue_current - self.cost_of_goods) / self.total_revenue_current) * 100
 
     """
     I actually don't want to use historic dividend payout
@@ -573,19 +603,22 @@ class Financial_Analysis:
         return self.FCF_past_rank
 
     def rank_current_ratio(self):
-        if self.current_ratio() <= 0.5:
-            self.current_ratio_rank = 1
-        elif 0.5 < self.current_ratio() <= 1:
-            self.current_ratio_rank = 2
-        elif 1 < self.current_ratio() <= 1.2:
-            self.current_ratio_rank = 3
-        elif 1.2 < self.current_ratio() <= 1.5:
-            self.current_ratio_rank = 4
-        elif 1.5 < self.current_ratio():
+        # ranks the current ratio
+        if 2 <= self.current_ratio():
             self.current_ratio_rank = 5
+        elif 1.5 <= self.current_ratio() < 2:
+            self.current_ratio_rank = 4
+        elif 1.2 <= self.current_ratio() < 1.5:
+            self.current_ratio_rank = 3
+        elif 1 <= self.current_ratio() < 1.2:
+            self.current_ratio_rank = 2
+        elif self.current_ratio() < 1:
+            self.current_ratio_rank = 1
+
         return self.current_ratio_rank
 
     def debt_to_equity_rank(self):
+        # ranks the debt to equity ratio
         if self.debt_equity_ratio() >= 2:
             self.dte_rank = 1
         elif 1.5 <= self.debt_equity_ratio() < 2:
@@ -599,6 +632,7 @@ class Financial_Analysis:
         return self.dte_rank
 
     def price_to_book_rank(self):
+        # ranks price to book ratio
         if self.price_to_book_ratio() <= 1:
             self.ptb_rank = 5
         elif 1 < self.price_to_book_ratio() <= 3:
@@ -612,6 +646,7 @@ class Financial_Analysis:
         return self.ptb_rank
 
     def price_to_sales_rank(self):
+        # ranks price to sales ratio
         if self.price_to_sales() <= 1:
             self.pts_rank = 5
         elif 1 < self.price_to_sales() <= 2:
@@ -625,6 +660,7 @@ class Financial_Analysis:
         return self.pts_rank
 
     def ratio_dividend_payout_rank(self):
+        # ranks dividend payout ratio
         if 30 <= self.dividend_payout_ratio() <= 50:
             self.dividend_payout_ratio_rank = 5
         elif (50 < self.dividend_payout_ratio() <= 55) or (25 <= self.dividend_payout_ratio() < 30):
@@ -638,6 +674,7 @@ class Financial_Analysis:
         return self.dividend_payout_ratio_rank
 
     def rank_dividend_yield_ratio(self):
+        # ranks dividend yield ratio
         if 6 <= self.dividend_yield_ratio():
             self.dividend_yield_rank = 5
         elif 4 <= self.dividend_yield_ratio() < 6:
@@ -650,10 +687,230 @@ class Financial_Analysis:
             self.dividend_yield_rank = 1
         return self.dividend_yield_rank
 
+    def rank_cash_flow_to_debt(self):
+        # ranks cash flow to debt ratio
+        if 66 <= self.cash_flow_to_debt():
+            self.cash_flow_to_debt_rank = 5
+        elif 50 <= self.cash_flow_to_debt() < 66:
+            self.cash_flow_to_debt_rank = 4
+        elif 40 <= self.cash_flow_to_debt() < 50:
+            self.cash_flow_to_debt_rank = 3
+        elif 30 <= self.cash_flow_to_debt() < 40:
+            self.cash_flow_to_debt_rank = 2
+        elif self.cash_flow_to_debt() < 30:
+            self.cash_flow_to_debt_rank = 1
+
+        return self.cash_flow_to_debt_rank
+
+    def past_historic_revenue_rank(self):
+        # determines average rate of change over last five years
+        yearly_rates_of_change_sum = 0
+        for i in range(0, len(self.total_revenue_historic_array) - 1):
+            yearly_rates_of_change_sum += ((self.total_revenue_historic_array[i + 1] - self.total_revenue_historic_array[i]) /
+                                           self.historic_free_cash_flow[i]) * 100
+        avg_roc = yearly_rates_of_change_sum / 4
+
+        # ranks the average percentage growth over the last 5 years
+        if 10 <= avg_roc:
+            self.historic_revenue_rank_past = 5
+        elif 8 <= avg_roc < 10:
+            self.historic_revenue_rank_past = 4
+        elif 6 <= avg_roc < 8:
+            self.historic_revenue_rank_past = 3
+        elif 4 <= avg_roc < 6:
+            self.historic_revenue_rank_past = 2
+        elif avg_roc < 4:
+            self.historic_revenue_rank_past = 1
+
+        return self.historic_revenue_rank_past
+
+    def current_historic_revenue_rank(self):
+        # determines four year avg
+        four_year_sum = 0
+        for i in self.historic_free_cash_flow[0:3]:
+            four_year_sum += i
+        four_year_avg = four_year_sum / 4
+
+        # determinges current rate of change
+        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+
+        # ranks the current growth
+        if 10 <= current_roc:
+            self.historic_revenue_rank_current = 5
+        elif 8 <= current_roc < 10:
+            self.historic_revenue_rank_current = 4
+        elif 6 <= current_roc < 8:
+            self.historic_revenue_rank_current = 3
+        elif 4 <= current_roc < 6:
+            self.historic_revenue_rank_current = 2
+        elif current_roc < 4:
+            self.historic_revenue_rank_current = 1
+
+        return self.historic_revenue_rank_current
+
+
+    def past_historic_net_income_rank(self):
+        # determines average rate of change over last five years
+        yearly_rates_of_change_sum = 0
+        for i in range(0, len(self.total_revenue_historic_array) - 1):
+            yearly_rates_of_change_sum += ((self.total_revenue_historic_array[i + 1] -
+                                            self.total_revenue_historic_array[i]) /
+                                           self.historic_free_cash_flow[i]) * 100
+        avg_roc = yearly_rates_of_change_sum / 4
+
+        # ranks the average change over last 5 years
+        if 20 <= avg_roc:
+            self.historic_net_income_rank_past = 5
+        elif 15 <= avg_roc < 20:
+            self.historic_net_income_rank_past = 4
+        elif 10 <= avg_roc < 15:
+            self.historic_net_income_rank_past = 3
+        elif 5 <= avg_roc < 15:
+            self.historic_net_income_rank_past = 2
+        elif avg_roc < 5:
+            self.historic_net_income_rank_past = 1
+
+        return self.historic_net_income_rank_past
+
+
+    def current_historic_net_income_rank(self):
+        # determines four year avg
+        four_year_sum = 0
+        for i in self.historic_free_cash_flow[0:3]:
+            four_year_sum += i
+        four_year_avg = four_year_sum / 4
+
+        # determinges current rate of change
+        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+
+        # ranks the current rate of change
+        if 20 <= current_roc:
+            self.historic_net_income_rank_current = 5
+        elif 15 <= current_roc < 20:
+            self.historic_net_income_rank_current = 4
+        elif 10 <= current_roc < 15:
+            self.historic_net_income_rank_current = 3
+        elif 5 <= current_roc < 15:
+            self.historic_net_income_rank_current = 2
+        elif current_roc < 5:
+            self.historic_net_income_rank_current = 1
+
+        return self.historic_net_income_rank_current
+
+    def rank_net_income_margin(self):
+        # ranks net income margin
+        if 20 <= self.net_income_margin():
+            self.net_income_margin_rank = 5
+        elif 15 <= self.net_income_margin() < 20:
+            self.net_income_margin_rank = 4
+        elif 10 <= self.net_income_margin() < 15:
+            self.net_income_margin_rank = 3
+        elif 5 <= self.net_income_margin() < 10:
+            self.net_income_margin_rank = 2
+        elif self.net_income_margin() < 5:
+            self.net_income_margin_rank = 1
+
+        return self.net_income_margin_rank
+
+    def past_historic_gross_profit_rank(self):
+        # determines average rate of change over last five years
+        yearly_rates_of_change_sum = 0
+        for i in range(0, len(self.total_revenue_historic_array) - 1):
+            yearly_rates_of_change_sum += ((self.total_revenue_historic_array[i + 1] -
+                                            self.total_revenue_historic_array[i]) /
+                                           self.historic_free_cash_flow[i]) * 100
+        avg_roc = yearly_rates_of_change_sum / 4
+
+        # ranks rate of change over last five years
+        if 45 <= avg_roc:
+            self.historic_gross_profit_rank_past = 5
+        elif 30 <= avg_roc < 45:
+            self.historic_gross_profit_rank_past = 4
+        elif 15 <= avg_roc < 30:
+            self.historic_gross_profit_rank_past = 3
+        elif 5 <= avg_roc < 15:
+            self.historic_gross_profit_rank_past = 2
+        elif avg_roc < 5:
+            self.historic_gross_profit_rank_past = 1
+
+        return self.historic_gross_profit_rank_past
+
+    def current_historic_gross_profit_rank(self):
+        # determines four year avg
+        four_year_sum = 0
+        for i in self.historic_free_cash_flow[0:3]:
+            four_year_sum += i
+        four_year_avg = four_year_sum / 4
+
+        # determinges current rate of change
+        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+
+        # ranks the current rate of change
+        if 45 <= current_roc:
+            self.historic_gross_profit_rank_current = 5
+        elif 30 <= current_roc < 45:
+            self.historic_gross_profit_rank_current = 4
+        elif 15 <= current_roc < 30:
+            self.historic_gross_profit_rank_current = 3
+        elif 5 <= current_roc < 15:
+            self.historic_gross_profit_rank_current = 2
+        elif current_roc < 5:
+            self.historic_gross_profit_rank_current = 1
+
+        return self.historic_gross_profit_rank_current
+
+
+    def rank_gross_profit_margin(self):
+        # ranks the gross profit margin
+        if 70 <= self.gross_profit_margin():
+            self.gross_profit_margin_rank = 5
+        elif 50 <= self.gross_profit_margin() < 70:
+            self.gross_profit_margin_rank = 4
+        elif 30 <= self.gross_profit_margin() < 50:
+            self.gross_profit_margin_rank = 3
+        elif 10 <= self.gross_profit_margin() < 30:
+            self.gross_profit_margin_rank = 2
+        elif self.gross_profit_margin() < 10:
+            self.gross_profit_margin_rank = 1
+
+        return self.gross_profit_margin_rank
+
+    def rank_leverage(self):
+        # ranks leverage
+        if 2 <= self.leverage():
+            self.leverage_rank = 1
+        elif 1.5 <= self.leverage() < 2:
+            self.leverage_rank = 2
+        elif 1 <= self.leverage() < 1.5:
+            self.leverage_rank = 3
+        elif 0.5 <= self.leverage() < 1:
+            self.leverage_rank = 4
+        elif self.leverage() < 0.5:
+            self.leverage_rank = 5
+
+        return self.leverage_rank
+
+    def rank_total_asset_turnover(self):
+        # ranks the total asset turnover ratio
+        if 2.5 <= self.total_asset_turnover():
+            self.total_asset_turnover_rank = 5
+        elif 0.5 <= self.total_asset_turnover() < 2.5:
+            self.total_asset_turnover_rank = 4
+        elif 0.25 <= self.total_asset_turnover() < 0.5:
+            self.total_asset_turnover_rank = 3
+        elif 0.15 <= self.total_asset_turnover() < 0.25:
+            self.total_asset_turnover_rank = 2
+        elif self.total_asset_turnover() < 0.15:
+            self.total_asset_turnover_rank = 1
+
+        return self.total_asset_turnover_rank
+
+
+
     def total_rank(self):
-        total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio()
-        self.avg_rank = total_rank_sum / 13
-        return round(self.avg_rank, 4)
+        total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.current_historic_revenue_rank() + self.past_historic_net_income_rank() + self.current_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.current_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
+        self.avg_rank = total_rank_sum / 24
+        return round(self.avg_rank, 5)
 
     def five_ytd_change(self):
         # returns five ytd percent change in stock price
@@ -2853,7 +3110,7 @@ print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
 
-"""
+FA = Financial_Analysis("AAPL")
 FA.current_ratio()
 FA.working_capital()
 FA.debt_equity_ratio()
@@ -2891,10 +3148,21 @@ FA.price_to_book_rank()
 FA.price_to_sales_rank()
 FA.ratio_dividend_payout_rank()
 FA.rank_dividend_yield_ratio()
-FA.total_rank()
+FA.rank_cash_flow_to_debt()
+FA.past_historic_revenue_rank()
+FA.current_historic_revenue_rank()
+FA.past_historic_net_income_rank()
+FA.current_historic_net_income_rank()
+FA.rank_net_income_margin()
+FA.past_historic_gross_profit_rank()
+FA.current_historic_gross_profit_rank()
+FA.rank_gross_profit_margin()
+FA.rank_leverage()
+FA.rank_total_asset_turnover()
+print(FA.total_rank())
 print(FA.five_ytd_change())
 print(FA.compare_rank_return())
-"""
+
 
 '''
 # Ended up requesting the API too many times so I can't us inheritance
