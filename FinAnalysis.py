@@ -75,12 +75,19 @@ class Financial_Analysis:
         current_month = price_as_list_month[0]
         self.monthly_closing_price = float(price_data_monthly["Monthly Time Series"][current_month]["4. close"])
 
+        """
         # five ytd monthly closing price
-        if len(price_as_list_month) < 60:
+        if len(price_as_list_month) < 59:
             five_ytd = price_as_list_month[-1]
         else:
-            five_ytd = price_as_list_month[60]
+            five_ytd = price_as_list_month[59]
         self.monthly_closing_price_five_ytd = float(price_data_monthly["Monthly Time Series"][five_ytd]["4. close"])
+        """
+        if len(balance_sheet_data["annualReports"]) < 5:
+            self.five_ytd_shareholder_equity = float(balance_sheet_data["annualReports"][-1]["totalShareholderEquity"])
+        else:
+            self.five_ytd_shareholder_equity = float(balance_sheet_data["annualReports"][4]["totalShareholderEquity"])
+
 
         if len(balance_sheet_data["annualReports"]) < 5:
             self.five_ytd_shares_outstanding = float(balance_sheet_data["annualReports"][-1]["commonStockSharesOutstanding"])
@@ -999,10 +1006,12 @@ class Financial_Analysis:
 
         return round(self.avg_rank, 5)
 
+    # don't think that I will include five ytd because the information is a bit inaccurate
+    '''
     def five_ytd_change(self):
         # returns five ytd percent change in stock price
-        market_cap_past = self.monthly_closing_price_five_ytd * self.five_ytd_shares_outstanding
-        market_cap_current = self.final_closing_price * self.shares_outstanding
+        market_cap_past = self.five_ytd_shareholder_equity / self.five_ytd_shares_outstanding
+        market_cap_current = self.total_shareholder_equity / self.shares_outstanding
         return round((((market_cap_current - market_cap_past) / market_cap_past) * 100), 4)
 
     def compare_rank_return(self):
@@ -1011,6 +1020,8 @@ class Financial_Analysis:
         self.compare.append(self.total_rank())
         self.compare.append(self.five_ytd_change())
         return self.compare
+    '''
+
 
 
 class Sector_Analysis_XLE:
@@ -3197,7 +3208,7 @@ print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
 
-FA = Financial_Analysis("FB")
+FA = Financial_Analysis("AAPL")
 FA.checkLength()
 FA.current_ratio()
 FA.working_capital()
@@ -3249,8 +3260,8 @@ FA.rank_gross_profit_margin()
 FA.rank_leverage()
 FA.rank_total_asset_turnover()
 print(FA.total_rank())
-print(FA.five_ytd_change())
-print(FA.compare_rank_return())
+#print(FA.five_ytd_change())
+#print(FA.compare_rank_return())
 
 
 """
