@@ -76,10 +76,17 @@ class Financial_Analysis:
         self.monthly_closing_price = float(price_data_monthly["Monthly Time Series"][current_month]["4. close"])
 
         # five ytd monthly closing price
-        five_ytd = price_as_list_month[60]
+        if len(price_as_list_month) < 60:
+            five_ytd = price_as_list_month[-1]
+        else:
+            five_ytd = price_as_list_month[60]
         self.monthly_closing_price_five_ytd = float(price_data_monthly["Monthly Time Series"][five_ytd]["4. close"])
 
-        self.five_ytd_shares_outstanding = float(balance_sheet_data["annualReports"][4]["commonStockSharesOutstanding"])
+        if len(balance_sheet_data["annualReports"]) < 5:
+            self.five_ytd_shares_outstanding = float(balance_sheet_data["annualReports"][-1]["commonStockSharesOutstanding"])
+        else:
+            self.five_ytd_shares_outstanding = float(balance_sheet_data["annualReports"][4]["commonStockSharesOutstanding"])
+
 
         '''
         # API doesn't have data for prices going that far
@@ -97,7 +104,10 @@ class Financial_Analysis:
 
         self.EBITDA_data = float(income_statement_data["annualReports"][0]["ebitda"])
 
-        self.current_debt = float(balance_sheet_data["annualReports"][0]["currentDebt"])
+        if balance_sheet_data["annualReports"][0]["currentDebt"] == "None":
+            self.current_debt = 0
+        else:
+            self.current_debt = float(balance_sheet_data["annualReports"][0]["currentDebt"])
 
         self.investments = float(balance_sheet_data["annualReports"][0]["investments"])
 
@@ -230,6 +240,13 @@ class Financial_Analysis:
         self.working_capital_rank = 0
         self.leverage_rank = 0
         self.total_asset_turnover_rank = 0
+        self.notLongEnough = False
+
+    def checkLength(self):
+        if len(self.years_array) < 5:
+            self.notLongEnough = True
+        else:
+            self.notLongEnough = False
 
     def current_ratio(self):
         return self.current_assets / self.current_liabilities
@@ -255,7 +272,11 @@ class Financial_Analysis:
         bars = ax.bar(x, self.total_revenue_historic_array)
         ax.set_title = "Historic Revenue"
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array, fontsize=8)
+        if len(self.total_revenue_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.total_revenue_historic_array))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         ax.bar_label(bars, fontsize=8)
         plt.ylabel("Total Revenue ($)")
         plt.xlabel("Date")
@@ -267,7 +288,11 @@ class Financial_Analysis:
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.net_income_historic_array)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array, fontsize=8)
+        if len(self.net_income_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.net_income_historic_array))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         ax.bar_label(bars, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Net Income ($)")
@@ -280,7 +305,11 @@ class Financial_Analysis:
         bars = ax.bar(x, self.gross_profit_historic_array)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array, fontsize=8)
+        if len(self.gross_profit_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.gross_profit_historic_array))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         fig.suptitle("Historic Gross Profit")
         plt.xlabel("Date")
         plt.ylabel("Gross Profit ($)")
@@ -303,7 +332,11 @@ class Financial_Analysis:
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.eps_historic_array)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array, fontsize=8)
+        if len(self.eps_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.eps_historic_array))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         ax.bar_label(bars, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Earnings Per Share (EPS)")
@@ -324,7 +357,11 @@ class Financial_Analysis:
         bars = ax.bar(x, self.historic_free_cash_flow)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array)
+        if len(self.historic_free_cash_flow) < len(self.years_array):
+            years = self.years_array[0:(len(self.historic_free_cash_flow))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         plt.xlabel("Date")
         plt.ylabel("Free Cash Flow ($)")
         plt.title("Historic Free Cash Flow")
@@ -359,7 +396,11 @@ class Financial_Analysis:
         bars = ax.bar(x, self.ROE_historic_array)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array, fontsize=8)
+        if len(self.ROE_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.ROE_historic_array))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         plt.ylabel("ROE")
         plt.xlabel("Date")
         fig.suptitle("Historic Return on Equity (ROE)")
@@ -371,7 +412,11 @@ class Financial_Analysis:
         bars = ax.bar(x, self.debt_historic_array)
         ax.bar_label(bars, fontsize=8)
         ax.set_xticks(x)
-        ax.set_xticklabels(self.years_array, fontsize=8)
+        if len(self.debt_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.debt_historic_array))]
+            ax.set_xticklabels(years, fontsize=8)
+        else:
+            ax.set_xticklabels(self.years_array, fontsize=8)
         plt.ylabel("Debt ($)")
         plt.xlabel("Date")
         fig.suptitle("Historic Debt")
@@ -418,10 +463,24 @@ class Financial_Analysis:
 
     def rh_vs_gp_vs_ni(self):
         fig, ax = plt.subplots()
-        ax.bar(self.years_array, self.net_income_historic_array, label="Net Income")
-        ax.bar(self.years_array, self.gross_profit_historic_array, label="Gross Profit",
+        if len(self.net_income_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.net_income_historic_array))]
+            ax.bar(years, self.net_income_historic_array, label="Net Income")
+        else:
+            ax.bar(self.years_array, self.net_income_historic_array, label="Net Income")
+
+        if len(self.gross_profit_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.gross_profit_historic_array))]
+            ax.bar(years, self.gross_profit_historic_array, label="Gross Profit")
+        else:
+            ax.bar(self.years_array, self.gross_profit_historic_array, label="Gross Profit",
                bottom=self.net_income_historic_array)
-        ax.bar(self.years_array, self.total_revenue_historic_array, label="Revenue",
+
+        if len(self.total_revenue_historic_array) < len(self.years_array):
+            years = self.years_array[0:(len(self.total_revenue_historic_array))]
+            ax.bar(years, self.total_revenue_historic_array, label="Revenue")
+        else:
+            ax.bar(self.years_array, self.total_revenue_historic_array, label="Revenue",
                bottom=self.gross_profit_historic_array)
         ax.legend(loc="lower left", bbox_to_anchor=(0.92, 0.92))
         ax.set_xticks("")
@@ -436,7 +495,10 @@ class Financial_Analysis:
         plt.show()
 
     def cash_flow_to_debt(self):
-        return self.operating_cash_flow / self.current_debt
+        if self.current_debt == 0:
+            return "N/A"
+        else:
+            return self.operating_cash_flow / self.current_debt
 
     def leverage(self):
         return self.total_assets / self.total_shareholder_equity
@@ -495,25 +557,28 @@ class Financial_Analysis:
         return self.EPS_past_rank
 
     def EPS_rank_current(self):
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
         # determines most recent growth in EPS compared to average EPS over last four years
-        past_four_year_sum = 0
-        for i in self.eps_historic_array[0:3]:
-            past_four_year_sum += i
-        past_four_year_avg = past_four_year_sum / 4
-        EPS_cur_growth = ((self.eps_historic_array[4] - past_four_year_avg) / past_four_year_avg) * 100
+            past_four_year_sum = 0
+            for i in self.eps_historic_array[0:3]:
+                past_four_year_sum += i
+            past_four_year_avg = past_four_year_sum / 4
+            EPS_cur_growth = ((self.eps_historic_array[4] - past_four_year_avg) / past_four_year_avg) * 100
 
-        # determines rank of the recent growth compared to average EPS over last four years
-        if EPS_cur_growth <= 3:
-            self.EPS_current_rank = 1
-        elif 3 < EPS_cur_growth <= 7:
-            self.EPS_current_rank = 2
-        elif 7 < EPS_cur_growth <= 11:
-            self.EPS_current_rank = 3
-        elif 11 < EPS_cur_growth <= 14:
-            self.EPS_current_rank = 4
-        elif EPS_cur_growth >= 15:
-            self.EPS_current_rank = 5
-        return self.EPS_current_rank
+            # determines rank of the recent growth compared to average EPS over last four years
+            if EPS_cur_growth <= 3:
+                self.EPS_current_rank = 1
+            elif 3 < EPS_cur_growth <= 7:
+                self.EPS_current_rank = 2
+            elif 7 < EPS_cur_growth <= 11:
+                self.EPS_current_rank = 3
+            elif 11 < EPS_cur_growth <= 14:
+                self.EPS_current_rank = 4
+            elif EPS_cur_growth >= 15:
+                self.EPS_current_rank = 5
+            return self.EPS_current_rank
+
 
     def ROE_rank_past(self):
         # this defines ROE growth over past 5 years
@@ -537,50 +602,30 @@ class Financial_Analysis:
         return self.ROE_past_rank
 
     def ROE_rank_current(self):
-        # get average ROE over last 4 years
-        four_year_sum = 0
-        for i in self.ROE_historic_array[0:3]:
-            four_year_sum += i
-        four_year_avg = four_year_sum / 4
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
+            # get average ROE over last 4 years
+            four_year_sum = 0
+            for i in self.ROE_historic_array[0:3]:
+                four_year_sum += i
+            four_year_avg = four_year_sum / 4
 
-        # calculates current growth compared to last 4 year average
-        ROE_cur_growth = ((self.ROE_historic_array[4] - four_year_avg) / four_year_avg) * 100
+            # calculates current growth compared to last 4 year average
+            ROE_cur_growth = ((self.ROE_historic_array[4] - four_year_avg) / four_year_avg) * 100
 
-        # determines rank of ROE
-        if ROE_cur_growth <= 5:
-            self.ROE_current_rank = 1
-        elif 5 < ROE_cur_growth <= 10:
-            self.ROE_current_rank = 2
-        elif 10 < ROE_cur_growth <= 14:
-            self.ROE_current_rank = 3
-        elif 14 < ROE_cur_growth <= 17:
-            self.ROE_current_rank = 4
-        elif 17 < ROE_cur_growth:
-            self.ROE_current_rank = 5
-        return self.ROE_current_rank
+            # determines rank of ROE
+            if ROE_cur_growth <= 5:
+                self.ROE_current_rank = 1
+            elif 5 < ROE_cur_growth <= 10:
+                self.ROE_current_rank = 2
+            elif 10 < ROE_cur_growth <= 14:
+                self.ROE_current_rank = 3
+            elif 14 < ROE_cur_growth <= 17:
+                self.ROE_current_rank = 4
+            elif 17 < ROE_cur_growth:
+                self.ROE_current_rank = 5
+            return self.ROE_current_rank
 
-    def free_cash_rank_current(self):
-        # determines four year avg of FCF
-        four_year_sum = 0
-        for i in self.historic_free_cash_flow[0:3]:
-            four_year_sum += i
-        four_year_avg = four_year_sum / 4
-
-        # determinges current rate of change
-        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
-
-        # determines current rank of FCF
-        if current_roc <= 5:
-            self.FCF_current_rank = 1
-        elif 5 < current_roc <= 10:
-            self.FCF_current_rank = 2
-        elif 10 < current_roc <= 15:
-            self.FCF_current_rank = 3
-        elif 15 < current_roc <= 20:
-            self.FCF_current_rank = 4
-        elif 20 < current_roc:
-            self.FCF_current_rank = 5
-        return self.FCF_current_rank
 
     def free_cash_rank_past(self):
         # determines average rate of change over last five years
@@ -601,6 +646,32 @@ class Financial_Analysis:
         elif 20 < avg_roc:
             self.FCF_past_rank = 5
         return self.FCF_past_rank
+
+
+    def free_cash_rank_current(self):
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
+            # determines four year avg of FCF
+            four_year_sum = 0
+            for i in self.historic_free_cash_flow[0:3]:
+                four_year_sum += i
+            four_year_avg = four_year_sum / 4
+
+            # determinges current rate of change
+            current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+
+            # determines current rank of FCF
+            if current_roc <= 5:
+                self.FCF_current_rank = 1
+            elif 5 < current_roc <= 10:
+                self.FCF_current_rank = 2
+            elif 10 < current_roc <= 15:
+                self.FCF_current_rank = 3
+            elif 15 < current_roc <= 20:
+                self.FCF_current_rank = 4
+            elif 20 < current_roc:
+                self.FCF_current_rank = 5
+            return self.FCF_current_rank
 
     def rank_current_ratio(self):
         # ranks the current ratio
@@ -689,7 +760,9 @@ class Financial_Analysis:
 
     def rank_cash_flow_to_debt(self):
         # ranks cash flow to debt ratio
-        if 66 <= self.cash_flow_to_debt():
+        if self.cash_flow_to_debt() == "N/A":
+            self.cash_flow_to_debt_rank = 0
+        elif 66 <= self.cash_flow_to_debt():
             self.cash_flow_to_debt_rank = 5
         elif 50 <= self.cash_flow_to_debt() < 66:
             self.cash_flow_to_debt_rank = 4
@@ -726,27 +799,30 @@ class Financial_Analysis:
 
     def current_historic_revenue_rank(self):
         # determines four year avg
-        four_year_sum = 0
-        for i in self.historic_free_cash_flow[0:3]:
-            four_year_sum += i
-        four_year_avg = four_year_sum / 4
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
+            # determines four year avg
+            four_year_sum = 0
+            for i in self.total_revenue_historic_array[0:3]:
+                four_year_sum += i
+            four_year_avg = four_year_sum / 4
 
-        # determinges current rate of change
-        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+            # determinges current rate of change
+            current_roc = ((self.total_revenue_historic_array[4] - four_year_avg) / four_year_avg) * 100
 
-        # ranks the current growth
-        if 10 <= current_roc:
-            self.historic_revenue_rank_current = 5
-        elif 8 <= current_roc < 10:
-            self.historic_revenue_rank_current = 4
-        elif 6 <= current_roc < 8:
-            self.historic_revenue_rank_current = 3
-        elif 4 <= current_roc < 6:
-            self.historic_revenue_rank_current = 2
-        elif current_roc < 4:
-            self.historic_revenue_rank_current = 1
+            # ranks the current growth
+            if 10 <= current_roc:
+                self.historic_revenue_rank_current = 5
+            elif 8 <= current_roc < 10:
+                self.historic_revenue_rank_current = 4
+            elif 6 <= current_roc < 8:
+                self.historic_revenue_rank_current = 3
+            elif 4 <= current_roc < 6:
+                self.historic_revenue_rank_current = 2
+            elif current_roc < 4:
+                self.historic_revenue_rank_current = 1
 
-        return self.historic_revenue_rank_current
+            return self.historic_revenue_rank_current
 
 
     def past_historic_net_income_rank(self):
@@ -774,28 +850,30 @@ class Financial_Analysis:
 
 
     def current_historic_net_income_rank(self):
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
         # determines four year avg
-        four_year_sum = 0
-        for i in self.historic_free_cash_flow[0:3]:
-            four_year_sum += i
-        four_year_avg = four_year_sum / 4
+            four_year_sum = 0
+            for i in self.net_income_historic_array[0:3]:
+                four_year_sum += i
+            four_year_avg = four_year_sum / 4
 
-        # determinges current rate of change
-        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+            # determinges current rate of change
+            current_roc = ((self.net_income_historic_array[4] - four_year_avg) / four_year_avg) * 100
 
-        # ranks the current rate of change
-        if 20 <= current_roc:
-            self.historic_net_income_rank_current = 5
-        elif 15 <= current_roc < 20:
-            self.historic_net_income_rank_current = 4
-        elif 10 <= current_roc < 15:
-            self.historic_net_income_rank_current = 3
-        elif 5 <= current_roc < 15:
-            self.historic_net_income_rank_current = 2
-        elif current_roc < 5:
-            self.historic_net_income_rank_current = 1
+            # ranks the current rate of change
+            if 20 <= current_roc:
+                self.historic_net_income_rank_current = 5
+            elif 15 <= current_roc < 20:
+                self.historic_net_income_rank_current = 4
+            elif 10 <= current_roc < 15:
+                self.historic_net_income_rank_current = 3
+            elif 5 <= current_roc < 15:
+                self.historic_net_income_rank_current = 2
+            elif current_roc < 5:
+                self.historic_net_income_rank_current = 1
 
-        return self.historic_net_income_rank_current
+            return self.historic_net_income_rank_current
 
     def rank_net_income_margin(self):
         # ranks net income margin
@@ -836,28 +914,30 @@ class Financial_Analysis:
         return self.historic_gross_profit_rank_past
 
     def current_historic_gross_profit_rank(self):
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
         # determines four year avg
-        four_year_sum = 0
-        for i in self.historic_free_cash_flow[0:3]:
-            four_year_sum += i
-        four_year_avg = four_year_sum / 4
+            four_year_sum = 0
+            for i in self.gross_profit_historic_array[0:3]:
+                four_year_sum += i
+            four_year_avg = four_year_sum / 4
 
-        # determinges current rate of change
-        current_roc = ((self.historic_free_cash_flow[4] - four_year_avg) / four_year_avg) * 100
+            # determinges current rate of change
+            current_roc = ((self.gross_profit_historic_array[4] - four_year_avg) / four_year_avg) * 100
 
-        # ranks the current rate of change
-        if 45 <= current_roc:
-            self.historic_gross_profit_rank_current = 5
-        elif 30 <= current_roc < 45:
-            self.historic_gross_profit_rank_current = 4
-        elif 15 <= current_roc < 30:
-            self.historic_gross_profit_rank_current = 3
-        elif 5 <= current_roc < 15:
-            self.historic_gross_profit_rank_current = 2
-        elif current_roc < 5:
-            self.historic_gross_profit_rank_current = 1
+            # ranks the current rate of change
+            if 45 <= current_roc:
+                self.historic_gross_profit_rank_current = 5
+            elif 30 <= current_roc < 45:
+                self.historic_gross_profit_rank_current = 4
+            elif 15 <= current_roc < 30:
+                self.historic_gross_profit_rank_current = 3
+            elif 5 <= current_roc < 15:
+                self.historic_gross_profit_rank_current = 2
+            elif current_roc < 5:
+                self.historic_gross_profit_rank_current = 1
 
-        return self.historic_gross_profit_rank_current
+            return self.historic_gross_profit_rank_current
 
 
     def rank_gross_profit_margin(self):
@@ -908,8 +988,15 @@ class Financial_Analysis:
 
 
     def total_rank(self):
-        total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.current_historic_revenue_rank() + self.past_historic_net_income_rank() + self.current_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.current_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
-        self.avg_rank = total_rank_sum / 24
+        # only runs this function if it has 5 years of data
+        if self.notLongEnough == False:
+            total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.current_historic_revenue_rank() + self.past_historic_net_income_rank() + self.current_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.current_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
+            self.avg_rank = total_rank_sum / 24
+        # else runs this one that doesn't count the methods I removed if it's less than 5 years of data
+        elif self.notLongEnough == True:
+            total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_past() + self.ROE_rank_past() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.past_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
+            self.avg_rank = total_rank_sum / 18
+
         return round(self.avg_rank, 5)
 
     def five_ytd_change(self):
@@ -3110,13 +3197,15 @@ print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
 
-FA = Financial_Analysis("AAPL")
+FA = Financial_Analysis("FB")
+FA.checkLength()
 FA.current_ratio()
 FA.working_capital()
 FA.debt_equity_ratio()
 FA.price_to_sales()
 FA.dividend_payout_ratio()
 FA.dividend_yield_ratio()
+FA.revenue_historic()
 FA.revenue_historic()
 FA.historic_net_income()
 FA.historic_gross_profit()
@@ -3164,6 +3253,8 @@ print(FA.five_ytd_change())
 print(FA.compare_rank_return())
 
 
+"""
+
 '''
 # Ended up requesting the API too many times so I can't us inheritance
 class Rank(Financial_Analysis):
@@ -3188,4 +3279,4 @@ class Rank(Financial_Analysis):
 
 r = Rank("IBM")
 print(r.pe_rank())
-'''
+"""
