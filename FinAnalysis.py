@@ -26,43 +26,87 @@ class Financial_Analysis:
         price_data_daily = price_daily.json()
         price_data_monthly = price_monthly.json()
 
-        self.total_assets = float(balance_sheet_data["annualReports"][0]["totalAssets"])
-        self.total_liabilities = float(balance_sheet_data["annualReports"][0]["totalLiabilities"])
-        self.total_shareholder_equity = float(balance_sheet_data["annualReports"][0]["totalShareholderEquity"])
-        self.total_revenue_current = float(income_statement_data["annualReports"][0]["totalRevenue"])
+        if balance_sheet_data["annualReports"][0]["totalAssets"] == "None":
+            self.total_assets = 0
+        else:
+            self.total_assets = float(balance_sheet_data["annualReports"][0]["totalAssets"])
+
+        if balance_sheet_data["annualReports"][0]["totalLiabilities"] == "None":
+            self.total_liabilities = 0
+        else:
+            self.total_liabilities = float(balance_sheet_data["annualReports"][0]["totalLiabilities"])
+
+        if balance_sheet_data["annualReports"][0]["totalShareholderEquity"] == "None":
+            self.total_shareholder_equity = 0
+        else:
+            self.total_shareholder_equity = float(balance_sheet_data["annualReports"][0]["totalShareholderEquity"])
+
+        if income_statement_data["annualReports"][0]["totalRevenue"] == "None":
+            self.total_revenue_current = 0
+        else:
+            self.total_revenue_current = float(income_statement_data["annualReports"][0]["totalRevenue"])
+
 
         total_revenue_historic = []
         for year in income_statement_data["annualReports"]:
-            total_revenue_historic.append(float('{:0.2e}'.format(float(year["totalRevenue"]))))
+            if year["totalRevenue"] == "None":
+                total_revenue_historic.append(0)
+            else:
+                total_revenue_historic.append(float('{:0.2e}'.format(float(year["totalRevenue"]))))
         total_revenue_historic.reverse()
         self.total_revenue_historic_array = np.array(total_revenue_historic)
 
-        self.net_income = float(cash_flow_data["annualReports"][0]["netIncome"])
+        if cash_flow_data["annualReports"][0]["netIncome"] == "None":
+            self.net_income = 0
+        else:
+            self.net_income = float(cash_flow_data["annualReports"][0]["netIncome"])
 
         net_income_historic = []
         for year in cash_flow_data["annualReports"]:
-            net_income_historic.append(float('{:0.2e}'.format(float(year["netIncome"]))))
+            if year["netIncome"] == "None":
+                net_income_historic.append(0)
+            else:
+                net_income_historic.append(float('{:0.2e}'.format(float(year["netIncome"]))))
         net_income_historic.reverse()
         self.net_income_historic_array = np.array(net_income_historic)
 
-        self.gross_profit = float(income_statement_data["annualReports"][0]["grossProfit"])
+        if income_statement_data["annualReports"][0]["grossProfit"] == "None":
+            self.gross_profit = 0
+        else:
+            self.gross_profit = float(income_statement_data["annualReports"][0]["grossProfit"])
 
         gross_profit_historic = []
         for year in income_statement_data["annualReports"]:
-            gross_profit_historic.append(float('{:0.2e}'.format(float(year["grossProfit"]))))
+            if year["grossProfit"] == "None":
+                gross_profit_historic.append(0)
+            else:
+                gross_profit_historic.append(float('{:0.2e}'.format(float(year["grossProfit"]))))
         gross_profit_historic.reverse()
         self.gross_profit_historic_array = np.array(gross_profit_historic)
 
         self.eps_historic_array = []
 
-        self.shares_outstanding = float(balance_sheet_data["annualReports"][0]["commonStockSharesOutstanding"])
+        if balance_sheet_data["annualReports"][0]["commonStockSharesOutstanding"] == "None":
+            self.shares_outstanding = 0
+        else:
+            self.shares_outstanding = float(balance_sheet_data["annualReports"][0]["commonStockSharesOutstanding"])
 
-        self.operating_cash_flow = float(cash_flow_data["annualReports"][0]["operatingCashflow"])
-        self.capital_expenditures = float(cash_flow_data["annualReports"][0]["capitalExpenditures"])
+        if cash_flow_data["annualReports"][0]["operatingCashflow"] == "None":
+            self.operating_cash_flow = 0
+        else:
+            self.operating_cash_flow = float(cash_flow_data["annualReports"][0]["operatingCashflow"])
+
+        if cash_flow_data["annualReports"][0]["capitalExpenditures"] == "None":
+            self.capital_expenditures = 0
+        else:
+            self.capital_expenditures = float(cash_flow_data["annualReports"][0]["capitalExpenditures"])
 
         capital_expenditures_historic = []
         for year in cash_flow_data["annualReports"]:
-            capital_expenditures_historic.append((float(year["capitalExpenditures"])))
+            if year["capitalExpenditures"] == "None":
+                capital_expenditures_historic.append(0)
+            else:
+                capital_expenditures_historic.append((float(year["capitalExpenditures"])))
         capital_expenditures_historic.reverse()
         self.capital_expenditures_historic_array = np.array(capital_expenditures_historic)
 
@@ -75,14 +119,14 @@ class Financial_Analysis:
         current_month = price_as_list_month[0]
         self.monthly_closing_price = float(price_data_monthly["Monthly Time Series"][current_month]["4. close"])
 
-        """
+
         # five ytd monthly closing price
         if len(price_as_list_month) < 59:
             five_ytd = price_as_list_month[-1]
         else:
             five_ytd = price_as_list_month[59]
         self.monthly_closing_price_five_ytd = float(price_data_monthly["Monthly Time Series"][five_ytd]["4. close"])
-        """
+
         if len(balance_sheet_data["annualReports"]) < 5:
             self.five_ytd_shareholder_equity = float(balance_sheet_data["annualReports"][-1]["totalShareholderEquity"])
         else:
@@ -108,18 +152,27 @@ class Financial_Analysis:
         ytd_final_closing_price.reverse()
         self.ytd_fin_close_price = ytd_final_closing_price
         '''
-
-        self.EBITDA_data = float(income_statement_data["annualReports"][0]["ebitda"])
+        if income_statement_data["annualReports"][0]["ebitda"] == "None":
+            self.EBITDA_data = 0
+        else:
+            self.EBITDA_data = float(income_statement_data["annualReports"][0]["ebitda"])
 
         if balance_sheet_data["annualReports"][0]["currentDebt"] == "None":
             self.current_debt = 0
         else:
             self.current_debt = float(balance_sheet_data["annualReports"][0]["currentDebt"])
 
-        self.investments = float(balance_sheet_data["annualReports"][0]["investments"])
+        if balance_sheet_data["annualReports"][0]["investments"] == "None":
+            self.investments = 0
+        else:
+            self.investments = float(balance_sheet_data["annualReports"][0]["investments"])
 
-        self.cash_cash_equivalents = float(
+        if balance_sheet_data["annualReports"][0]["cashAndCashEquivalentsAtCarryingValue"] == "None":
+            self.cash_cash_equivalents = 0
+        else:
+            self.cash_cash_equivalents = float(
             balance_sheet_data["annualReports"][0]["cashAndCashEquivalentsAtCarryingValue"])
+
 
         debt_historic = []
         for year in balance_sheet_data["annualReports"]:
@@ -132,37 +185,55 @@ class Financial_Analysis:
 
         operating_cash_flow_historic = []
         for year in cash_flow_data["annualReports"]:
-            operating_cash_flow_historic.append(float(year["operatingCashflow"]))
+            if year["operatingCashflow"] == "None":
+                operating_cash_flow_historic.append(0)
+            else:
+                operating_cash_flow_historic.append(float(year["operatingCashflow"]))
         operating_cash_flow_historic.reverse()
         self.operating_cash_flow_historic_array = np.array(operating_cash_flow_historic)
 
         invest_cash_flow_historic = []
         for year in cash_flow_data["annualReports"]:
-            invest_cash_flow_historic.append(float(year["cashflowFromInvestment"]))
+            if year["cashflowFromInvestment"] == "None":
+                invest_cash_flow_historic.append(0)
+            else:
+                invest_cash_flow_historic.append(float(year["cashflowFromInvestment"]))
         invest_cash_flow_historic.reverse()
         self.invest_cash_flow_historic_array = np.array(invest_cash_flow_historic)
 
         finance_cash_flow_historic = []
         for year in cash_flow_data["annualReports"]:
-            finance_cash_flow_historic.append(float(year["cashflowFromFinancing"]))
+            if year["cashflowFromFinancing"] == "None":
+                finance_cash_flow_historic.append(0)
+            else:
+                finance_cash_flow_historic.append(float(year["cashflowFromFinancing"]))
         finance_cash_flow_historic.reverse()
         self.finance_cash_flow_historic_array = np.array(finance_cash_flow_historic)
 
         total_assets_historic = []
         for year in balance_sheet_data["annualReports"]:
-            total_assets_historic.append(float(year["totalAssets"]))
+            if year["totalAssets"] == "None":
+                total_assets_historic.append(0)
+            else:
+                total_assets_historic.append(float(year["totalAssets"]))
         total_assets_historic.reverse()
         self.total_assets_historic_array = np.array(total_assets_historic)
 
         total_liabilities_historic = []
         for year in balance_sheet_data["annualReports"]:
-            total_liabilities_historic.append(float(year["totalLiabilities"]))
+            if year["totalLiabilities"] == "None":
+                total_liabilities_historic.append(0)
+            else:
+                total_liabilities_historic.append(float(year["totalLiabilities"]))
         total_liabilities_historic.reverse()
         self.total_liabilities_historic_array = np.array(total_liabilities_historic)
 
         total_shareholder_equity_historic = []
         for year in balance_sheet_data["annualReports"]:
-            total_shareholder_equity_historic.append(float(year["totalShareholderEquity"]))
+            if year["totalShareholderEquity"] == "None":
+                total_shareholder_equity_historic.append(0)
+            else:
+                total_shareholder_equity_historic.append(float(year["totalShareholderEquity"]))
         total_shareholder_equity_historic.reverse()
         self.total_shareholder_equity_historic_array = np.array(total_shareholder_equity_historic)
 
@@ -171,10 +242,20 @@ class Financial_Analysis:
         else:
             self.dividend_payout = float(cash_flow_data["annualReports"][0]["dividendPayout"])
 
-        self.cost_of_goods = float(income_statement_data["annualReports"][0]["costofGoodsAndServicesSold"])
+        if income_statement_data["annualReports"][0]["costofGoodsAndServicesSold"] == "None":
+            self.cost_of_goods = 0
+        else:
+            self.cost_of_goods = float(income_statement_data["annualReports"][0]["costofGoodsAndServicesSold"])
 
-        self.current_assets = float(balance_sheet_data["annualReports"][0]["totalCurrentAssets"])
-        self.current_liabilities = float(balance_sheet_data["annualReports"][0]["totalCurrentLiabilities"])
+        if balance_sheet_data["annualReports"][0]["totalCurrentAssets"] == "None":
+            self.current_assets = 0
+        else:
+            self.current_assets = float(balance_sheet_data["annualReports"][0]["totalCurrentAssets"])
+
+        if balance_sheet_data["annualReports"][0]["totalCurrentLiabilities"] == "None":
+            self.current_liabilities = 0
+        else:
+            self.current_liabilities = float(balance_sheet_data["annualReports"][0]["totalCurrentLiabilities"])
         '''
         Don't end up using this
         dividend_payout_historic = []
@@ -256,19 +337,31 @@ class Financial_Analysis:
             self.notLongEnough = False
 
     def current_ratio(self):
-        return self.current_assets / self.current_liabilities
+        if not self.current_liabilities == 0:
+            return self.current_assets / self.current_liabilities
+        else:
+            return "Not Enough Data"
 
     def working_capital(self):
         return self.current_assets - self.current_liabilities
 
     def debt_equity_ratio(self):
-        return self.total_liabilities / self.total_shareholder_equity
+        if not self.total_shareholder_equity == 0:
+            return self.total_liabilities / self.total_shareholder_equity
+        else:
+            return "Not Enough Data"
 
     def price_to_sales(self):
-        return self.final_closing_price / self.total_revenue_current
+        if not self.total_revenue_current == 0:
+            return self.final_closing_price / self.total_revenue_current
+        else:
+            return "Not Enough Data"
 
     def dividend_payout_ratio(self):
-        return self.dividend_payout / self.net_income
+        if not self.net_income == 0:
+            return self.dividend_payout / self.net_income
+        else:
+            return "Not Enough Data"
 
     def dividend_yield_ratio(self):
         return (self.dividend_payout / self.shares_outstanding) / self.final_closing_price
@@ -378,10 +471,16 @@ class Financial_Analysis:
         return self.total_shareholder_equity / self.shares_outstanding
 
     def price_to_book_ratio(self):
-        return self.final_closing_price / self.BVPS()
+        if not self.BVPS() == 0:
+            return self.final_closing_price / self.BVPS()
+        else:
+            return "Not Enough Data"
 
     def PE_ratio(self):
-        return self.final_closing_price / self.EPS()
+        if not self.EPS() == 0:
+            return self.final_closing_price / self.EPS()
+        else:
+            return "Not Enough Data"
 
     def EBITDA(self):
         return self.EBITDA_data
@@ -503,7 +602,7 @@ class Financial_Analysis:
 
     def cash_flow_to_debt(self):
         if self.current_debt == 0:
-            return "N/A"
+            return "Not Enough Data"
         else:
             return self.operating_cash_flow / self.current_debt
 
@@ -511,13 +610,22 @@ class Financial_Analysis:
         return self.total_assets / self.total_shareholder_equity
 
     def total_asset_turnover(self):
-        return self.total_revenue_current / (self.total_assets / 2)
+        if not self.total_assets == 0:
+            return self.total_revenue_current / (self.total_assets / 2)
+        else:
+            return "Not Enough Data"
 
     def net_income_margin(self):
-        return (self.net_income / self.total_revenue_current) * 100
+        if not self.total_revenue_current == 0:
+            return (self.net_income / self.total_revenue_current) * 100
+        else:
+            return "Not Enough Data"
 
     def gross_profit_margin(self):
-        return ((self.total_revenue_current - self.cost_of_goods) / self.total_revenue_current) * 100
+        if not self.total_revenue_current == 0:
+            return ((self.total_revenue_current - self.cost_of_goods) / self.total_revenue_current) * 100
+        else:
+            return "Not Enough Data"
 
     """
     I actually don't want to use historic dividend payout
@@ -1010,7 +1118,10 @@ class Financial_Analysis:
     '''
     def five_ytd_change(self):
         # returns five ytd percent change in stock price
-        market_cap_past = self.five_ytd_shareholder_equity / self.five_ytd_shares_outstanding
+        if len(self.years_array) < 5:
+            market_cap_past = self.monthly_closing_price_five_ytd * self.shares_outstanding
+        else:
+            market_cap_past = self.monthly_closing_price_five_ytd * self.five_ytd_shares_outstanding
         market_cap_current = self.total_shareholder_equity / self.shares_outstanding
         return round((((market_cap_current - market_cap_past) / market_cap_past) * 100), 4)
 
@@ -1021,6 +1132,7 @@ class Financial_Analysis:
         self.compare.append(self.five_ytd_change())
         return self.compare
     '''
+
 
 
 
@@ -3208,7 +3320,7 @@ print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
 
-FA = Financial_Analysis("AAPL")
+FA = Financial_Analysis("NIO")
 FA.checkLength()
 FA.current_ratio()
 FA.working_capital()
@@ -3259,9 +3371,10 @@ FA.current_historic_gross_profit_rank()
 FA.rank_gross_profit_margin()
 FA.rank_leverage()
 FA.rank_total_asset_turnover()
+print(len(FA.years_array))
 print(FA.total_rank())
-#print(FA.five_ytd_change())
-#print(FA.compare_rank_return())
+# print(FA.five_ytd_change())
+# print(FA.compare_rank_return())
 
 
 """
