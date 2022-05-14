@@ -377,7 +377,7 @@ class Financial_Analysis:
             ax.set_xticklabels(years, fontsize=8)
         else:
             ax.set_xticklabels(self.years_array, fontsize=8)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         plt.ylabel("Total Revenue ($)")
         plt.xlabel("Date")
         fig.suptitle('Historic Revenue')
@@ -393,7 +393,7 @@ class Financial_Analysis:
             ax.set_xticklabels(years, fontsize=8)
         else:
             ax.set_xticklabels(self.years_array, fontsize=8)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         plt.xlabel("Date")
         plt.ylabel("Net Income ($)")
         fig.suptitle("Historic Net Income")
@@ -403,7 +403,7 @@ class Financial_Analysis:
         x = np.arange(len(self.gross_profit_historic_array))
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.gross_profit_historic_array)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         ax.set_xticks(x)
         if len(self.gross_profit_historic_array) < len(self.years_array):
             years = self.years_array[0:(len(self.gross_profit_historic_array))]
@@ -437,7 +437,7 @@ class Financial_Analysis:
             ax.set_xticklabels(years, fontsize=8)
         else:
             ax.set_xticklabels(self.years_array, fontsize=8)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         plt.xlabel("Date")
         plt.ylabel("Earnings Per Share (EPS)")
         fig.suptitle("Historic Earnings Per Share (EPS)")
@@ -455,7 +455,7 @@ class Financial_Analysis:
         x = np.arange(len(self.historic_free_cash_flow))
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.historic_free_cash_flow)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         ax.set_xticks(x)
         if len(self.historic_free_cash_flow) < len(self.years_array):
             years = self.years_array[0:(len(self.historic_free_cash_flow))]
@@ -500,7 +500,7 @@ class Financial_Analysis:
         x = np.arange(len(self.ROE_historic_array))
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.ROE_historic_array)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         ax.set_xticks(x)
         if len(self.ROE_historic_array) < len(self.years_array):
             years = self.years_array[0:(len(self.ROE_historic_array))]
@@ -516,7 +516,7 @@ class Financial_Analysis:
         x = np.arange(len(self.debt_historic_array))
         fig, ax = plt.subplots()
         bars = ax.bar(x, self.debt_historic_array)
-        ax.bar_label(bars, fontsize=8)
+        ax.bar_label(bars, fontsize=8, padding=3)
         ax.set_xticks(x)
         if len(self.debt_historic_array) < len(self.years_array):
             years = self.years_array[0:(len(self.debt_historic_array))]
@@ -569,28 +569,15 @@ class Financial_Analysis:
 
     def rh_vs_gp_vs_ni(self):
         fig, ax = plt.subplots()
-        if len(self.net_income_historic_array) < len(self.years_array):
-            years = self.years_array[0:(len(self.net_income_historic_array))]
-            ax.bar(years, self.net_income_historic_array, label="Net Income")
-        else:
-            ax.bar(self.years_array, self.net_income_historic_array, label="Net Income")
-
-        if len(self.gross_profit_historic_array) < len(self.years_array):
-            years = self.years_array[0:(len(self.gross_profit_historic_array))]
-            ax.bar(years, self.gross_profit_historic_array, label="Gross Profit")
-        else:
-            ax.bar(self.years_array, self.gross_profit_historic_array, label="Gross Profit",
-               bottom=self.net_income_historic_array)
-
-        if len(self.total_revenue_historic_array) < len(self.years_array):
-            years = self.years_array[0:(len(self.total_revenue_historic_array))]
-            ax.bar(years, self.total_revenue_historic_array, label="Revenue")
-        else:
-            ax.bar(self.years_array, self.total_revenue_historic_array, label="Revenue",
-               bottom=self.gross_profit_historic_array)
-        ax.legend(loc="lower left", bbox_to_anchor=(0.92, 0.92))
-        ax.set_xticks("")
+        x = np.arange(len(self.net_income_historic_array))
+        x_large = x * 10
+        w = 6
+        ax.bar(x_large - ((w / 3) + 1), self.net_income_historic_array, label="Net Income", width=3)
+        ax.bar(x_large, self.gross_profit_historic_array, label="Gross Profit", width=3)
+        ax.bar(x_large + ((w / 3) + 1), self.total_revenue_historic_array, label="Revenue", width=3)
+        ax.set_xticks([])
         ax.set_xticklabels([])
+        ax.legend(loc="lower left", bbox_to_anchor=(0.92, 0.92))
         plt.ylabel("Revenue/Gross Profit/Net Income ($)")
         fig.suptitle("Historic Revenue vs Gross Profit vs Net Income")
         plt.table(cellText=[self.total_revenue_historic_array, self.gross_profit_historic_array,
@@ -638,7 +625,9 @@ class Financial_Analysis:
 
     def pe_ratio_rank(self):
         # determines rank of PE ratio
-        if self.PE_ratio() <= 15:
+        if type(self.PE_ratio()) == str:
+            self.PE_ratio_rank = 'N/A'
+        elif self.PE_ratio() <= 15:
             self.PE_ratio_rank = 5
         elif 15 < self.PE_ratio() <= 20:
             self.PE_ratio_rank = 4
@@ -790,7 +779,9 @@ class Financial_Analysis:
 
     def rank_current_ratio(self):
         # ranks the current ratio
-        if 2 <= self.current_ratio():
+        if type(self.current_ratio()) == str:
+            self.current_ratio_rank = "N/A"
+        elif 2 <= self.current_ratio():
             self.current_ratio_rank = 5
         elif 1.5 <= self.current_ratio() < 2:
             self.current_ratio_rank = 4
@@ -805,7 +796,9 @@ class Financial_Analysis:
 
     def debt_to_equity_rank(self):
         # ranks the debt to equity ratio
-        if self.debt_equity_ratio() >= 2:
+        if type(self.debt_equity_ratio()) == str:
+            self.dte_rank = "N/A"
+        elif self.debt_equity_ratio() >= 2:
             self.dte_rank = 1
         elif 1.5 <= self.debt_equity_ratio() < 2:
             self.dte_rank = 2
@@ -819,7 +812,9 @@ class Financial_Analysis:
 
     def price_to_book_rank(self):
         # ranks price to book ratio
-        if self.price_to_book_ratio() <= 1:
+        if type(self.price_to_book_ratio()) == str:
+            self.ptb_rank = "N/A"
+        elif self.price_to_book_ratio() <= 1:
             self.ptb_rank = 5
         elif 1 < self.price_to_book_ratio() <= 3:
             self.ptb_rank = 4
@@ -833,7 +828,9 @@ class Financial_Analysis:
 
     def price_to_sales_rank(self):
         # ranks price to sales ratio
-        if self.price_to_sales() <= 1:
+        if type(self.price_to_sales()) == str:
+            self.pts_rank = "N/A"
+        elif self.price_to_sales() <= 1:
             self.pts_rank = 5
         elif 1 < self.price_to_sales() <= 2:
             self.pts_rank = 4
@@ -847,7 +844,9 @@ class Financial_Analysis:
 
     def ratio_dividend_payout_rank(self):
         # ranks dividend payout ratio
-        if 30 <= self.dividend_payout_ratio() <= 50:
+        if type(self.dividend_payout_ratio()) == str:
+            self.dividend_payout_ratio_rank = "N/A"
+        elif 30 <= self.dividend_payout_ratio() <= 50:
             self.dividend_payout_ratio_rank = 5
         elif (50 < self.dividend_payout_ratio() <= 55) or (25 <= self.dividend_payout_ratio() < 30):
             self.dividend_payout_ratio_rank = 4
@@ -861,7 +860,9 @@ class Financial_Analysis:
 
     def rank_dividend_yield_ratio(self):
         # ranks dividend yield ratio
-        if 6 <= self.dividend_yield_ratio():
+        if type(self.dividend_yield_ratio()) == str:
+            self.dividend_yield_rank = 'N/A'
+        elif 6 <= self.dividend_yield_ratio():
             self.dividend_yield_rank = 5
         elif 4 <= self.dividend_yield_ratio() < 6:
             self.dividend_yield_rank = 4
@@ -875,8 +876,8 @@ class Financial_Analysis:
 
     def rank_cash_flow_to_debt(self):
         # ranks cash flow to debt ratio
-        if self.cash_flow_to_debt() == "N/A":
-            self.cash_flow_to_debt_rank = 0
+        if type(self.cash_flow_to_debt()) == str:
+            self.cash_flow_to_debt_rank = "N/A"
         elif 66 <= self.cash_flow_to_debt():
             self.cash_flow_to_debt_rank = 5
         elif 50 <= self.cash_flow_to_debt() < 66:
@@ -992,7 +993,9 @@ class Financial_Analysis:
 
     def rank_net_income_margin(self):
         # ranks net income margin
-        if 20 <= self.net_income_margin():
+        if type(self.net_income_margin()) == str:
+            self.net_income_margin_rank = "N/A"
+        elif 20 <= self.net_income_margin():
             self.net_income_margin_rank = 5
         elif 15 <= self.net_income_margin() < 20:
             self.net_income_margin_rank = 4
@@ -1057,7 +1060,9 @@ class Financial_Analysis:
 
     def rank_gross_profit_margin(self):
         # ranks the gross profit margin
-        if 70 <= self.gross_profit_margin():
+        if type(self.gross_profit_margin()) == str:
+            self.gross_profit_margin_rank = "N/A"
+        elif 70 <= self.gross_profit_margin():
             self.gross_profit_margin_rank = 5
         elif 50 <= self.gross_profit_margin() < 70:
             self.gross_profit_margin_rank = 4
@@ -1072,7 +1077,9 @@ class Financial_Analysis:
 
     def rank_leverage(self):
         # ranks leverage
-        if 2 <= self.leverage():
+        if type(self.leverage()) == str:
+            self.leverage_rank = "N/A"
+        elif 2 <= self.leverage():
             self.leverage_rank = 1
         elif 1.5 <= self.leverage() < 2:
             self.leverage_rank = 2
@@ -1087,7 +1094,9 @@ class Financial_Analysis:
 
     def rank_total_asset_turnover(self):
         # ranks the total asset turnover ratio
-        if 2.5 <= self.total_asset_turnover():
+        if type(self.total_asset_turnover()) == str:
+            self.total_asset_turnover_rank = "N/A"
+        elif 2.5 <= self.total_asset_turnover():
             self.total_asset_turnover_rank = 5
         elif 0.5 <= self.total_asset_turnover() < 2.5:
             self.total_asset_turnover_rank = 4
@@ -1104,13 +1113,25 @@ class Financial_Analysis:
 
     def total_rank(self):
         # only runs this function if it has 5 years of data
+        methodList = [self.ratio_dividend_payout_rank(), self.price_to_sales_rank(), self.price_to_book_rank(), self.debt_to_equity_rank(), self.rank_current_ratio(), self.free_cash_rank_current(), self.free_cash_rank_past(), self.ROE_rank_past(), self.ROE_rank_current(), self.EPS_rank_current(), self.EPS_rank_past(), self.pe_ratio_rank(), self.rank_dividend_yield_ratio(), self.rank_cash_flow_to_debt(), self.past_historic_revenue_rank(), self.current_historic_revenue_rank(), self.past_historic_net_income_rank(), self.current_historic_net_income_rank(), self.rank_net_income_margin(), self.past_historic_gross_profit_rank(), self.current_historic_gross_profit_rank(), self.rank_gross_profit_margin(), self.rank_leverage(), self.rank_total_asset_turnover()]
+        methodList2 = [self.ratio_dividend_payout_rank(), self.price_to_sales_rank(), self.price_to_book_rank(), self.debt_to_equity_rank(), self.rank_current_ratio(), self.free_cash_rank_past(), self.ROE_rank_past(), self.EPS_rank_past(), self.pe_ratio_rank(), self.rank_dividend_yield_ratio(), self.rank_cash_flow_to_debt(), self.past_historic_revenue_rank(), self.past_historic_net_income_rank(), self.rank_net_income_margin(), self.past_historic_gross_profit_rank(), self.rank_gross_profit_margin(), self.rank_leverage(), self.rank_total_asset_turnover()]
+        fltMethods = []
+        fltMethods2 = []
         if self.notLongEnough == False:
-            total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.current_historic_revenue_rank() + self.past_historic_net_income_rank() + self.current_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.current_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
-            self.avg_rank = total_rank_sum / 24
+            for item in methodList:
+                if type(item) == int:
+                    fltMethods.append(item)
+            total_rank_sum = sum(fltMethods)
+            # total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_current() + self.free_cash_rank_past() + self.ROE_rank_past() + self.ROE_rank_current() + self.EPS_rank_current() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.current_historic_revenue_rank() + self.past_historic_net_income_rank() + self.current_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.current_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
+            self.avg_rank = total_rank_sum / len(fltMethods)
         # else runs this one that doesn't count the methods I removed if it's less than 5 years of data
         elif self.notLongEnough == True:
-            total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_past() + self.ROE_rank_past() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.past_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
-            self.avg_rank = total_rank_sum / 18
+            for item in methodList2:
+                if type(item) == int:
+                    fltMethods2.append(item)
+            total_rank_sum = sum(fltMethods2)
+            # total_rank_sum = self.ratio_dividend_payout_rank() + self.price_to_sales_rank() + self.price_to_book_rank() + self.debt_to_equity_rank() + self.rank_current_ratio() + self.free_cash_rank_past() + self.ROE_rank_past() + self.EPS_rank_past() + self.pe_ratio_rank() + self.rank_dividend_yield_ratio() + self.rank_cash_flow_to_debt() + self.past_historic_revenue_rank() + self.past_historic_net_income_rank() + self.rank_net_income_margin() + self.past_historic_gross_profit_rank() + self.rank_gross_profit_margin() + self.rank_leverage() + self.rank_total_asset_turnover()
+            self.avg_rank = total_rank_sum / len(fltMethods2)
 
         return round(self.avg_rank, 5)
 
@@ -3320,7 +3341,7 @@ print(f"Historic Cash Flow: {FA.historic_cash_flow()}")
 print(f"Historic Debt: {FA.historic_debt()}")
 """
 
-FA = Financial_Analysis("NIO")
+FA = Financial_Analysis("PLTR")
 FA.checkLength()
 FA.current_ratio()
 FA.working_capital()
@@ -3371,7 +3392,6 @@ FA.current_historic_gross_profit_rank()
 FA.rank_gross_profit_margin()
 FA.rank_leverage()
 FA.rank_total_asset_turnover()
-print(len(FA.years_array))
 print(FA.total_rank())
 # print(FA.five_ytd_change())
 # print(FA.compare_rank_return())
