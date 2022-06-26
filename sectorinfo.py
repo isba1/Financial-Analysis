@@ -5,7 +5,7 @@ import json
 # all their information for the balance sheet, income statement, and cash flow in different json files, this way
 # I don't have to access the api and instead can access my own json files
 
-symbol = 'AAPL'  # ticker goes here
+symbol = 'COP'  # ticker goes here
 
 url_income_statement = f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={symbol}&apikey=KJHOTYX4RQYVFABB"
 url_balance_sheet = f"https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={symbol}&apikey=KJHOTYX4RQYVFABB"
@@ -23,5 +23,12 @@ json_object_balance = json.dumps(balance_sheet_data)
 json_object_cash = json.dumps(cash_flow_data)
 json_object_income = json.dumps(income_statement_data)
 
-with open('SectorFinAnalysisJson/AAPLJson/AAPLbalancesheet.json', 'w') as f:
-    f.write(json_object_balance)
+with open(f'SectorFinAnalysisJson/{symbol}Json/{symbol}income.json', 'w') as f:
+    f.write(json_object_income)
+
+with open(f'SectorFinAnalysisJson/{symbol}Json/{symbol}cash.json', 'w') as c:
+    c.write(json_object_cash)
+
+with open(f'SectorFinAnalysisJson/{symbol}Json/{symbol}balance.json', 'w') as b:
+    b.write(json_object_balance)
+
